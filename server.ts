@@ -680,7 +680,70 @@ app.post('/api/auth/register', (req, res) => {
     preferredStartTime: '16:00',
   };
 
+  const starterSubjects: Subject[] = [
+    {
+      id: `sub-java-${newUser.id}`,
+      userId: newUser.id,
+      name: 'Java Programming',
+      description: 'Core Java, OOP principles, Collections Framework, Exception Handling and Stream API.',
+      difficulty: 'Medium',
+      priority: 'High',
+      examDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: `sub-dsa-${newUser.id}`,
+      userId: newUser.id,
+      name: 'Data Structures & Algorithms',
+      description: 'Arrays, Linked Lists, Trees, BST, Graphs, Sorting, and Dynamic Programming.',
+      difficulty: 'Hard',
+      priority: 'High',
+      examDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: `sub-dbms-${newUser.id}`,
+      userId: newUser.id,
+      name: 'Database Management Systems',
+      description: 'Relational Model, SQL queries, Normalization, ACID Properties, and Indexing.',
+      difficulty: 'Medium',
+      priority: 'Medium',
+      examDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
+    },
+  ];
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const starterTasks: StudyTask[] = [
+    {
+      id: `task-1-${newUser.id}`,
+      userId: newUser.id,
+      subjectId: starterSubjects[1].id,
+      subjectName: 'Data Structures & Algorithms',
+      topic: 'Binary Trees & BST Traversals',
+      scheduledDate: todayStr,
+      startTime: '16:00',
+      durationMinutes: 60,
+      status: 'In Progress',
+      priority: 'High',
+    },
+    {
+      id: `task-2-${newUser.id}`,
+      userId: newUser.id,
+      subjectId: starterSubjects[0].id,
+      subjectName: 'Java Programming',
+      topic: 'Multithreading & Concurrency',
+      scheduledDate: todayStr,
+      startTime: '17:15',
+      durationMinutes: 45,
+      status: 'Pending',
+      priority: 'High',
+    },
+  ];
+
   db.users.push(newUser);
+  db.subjects.push(...starterSubjects);
+  db.studyTasks.push(...starterTasks);
   saveDB(db);
 
   return res.status(201).json({

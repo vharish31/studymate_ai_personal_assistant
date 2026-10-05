@@ -99,6 +99,7 @@ export default function App() {
   const handleLogin = async (email: string, pass: string) => {
     const res = await api.login(email, pass);
     setUser(res.user);
+    setAuthModalMode(null);
     setActiveTab('dashboard');
     await loadUserData();
   };
@@ -106,6 +107,7 @@ export default function App() {
   const handleRegister = async (name: string, email: string, pass: string, confirm: string) => {
     const res = await api.register(name, email, pass, confirm);
     setUser(res.user);
+    setAuthModalMode(null);
     setActiveTab('dashboard');
     await loadUserData();
   };
@@ -113,6 +115,7 @@ export default function App() {
   const handleLogout = async () => {
     await api.logout();
     setUser(null);
+    setAuthModalMode(null);
     setActiveTab('landing');
   };
 
@@ -230,13 +233,18 @@ export default function App() {
       />
 
       {/* Main Container */}
-      {!user || activeTab === 'landing' ? (
+      {!user || activeTab === 'landing' || activeTab === 'login' || activeTab === 'register' ? (
         <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-8 w-full">
           <LandingPage
             onLogin={handleLogin}
             onRegister={handleRegister}
-            initialAuthModal={authModalMode}
-            onCloseAuthModal={() => setAuthModalMode(null)}
+            initialAuthModal={authModalMode || (activeTab === 'login' ? 'login' : activeTab === 'register' ? 'register' : null)}
+            onCloseAuthModal={() => {
+              setAuthModalMode(null);
+              if (activeTab === 'login' || activeTab === 'register') {
+                setActiveTab('landing');
+              }
+            }}
           />
         </main>
       ) : (

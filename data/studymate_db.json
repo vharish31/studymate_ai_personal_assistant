@@ -8,6 +8,24 @@
       "createdAt": "2026-09-01T08:00:00.000Z",
       "dailyStudyHours": 3.5,
       "preferredStartTime": "16:00"
+    },
+    {
+      "id": "user-1791215665591",
+      "name": "Test User",
+      "email": "test@example.com",
+      "passwordHash": "$2b$10$K/rC3iwdXOOih53Ak70eXexA4S5XoqotVSY9j97O6pYhhK2k5ZSRy",
+      "createdAt": "2026-10-05T15:54:25.591Z",
+      "dailyStudyHours": 3,
+      "preferredStartTime": "16:00"
+    },
+    {
+      "id": "user-1791215773619",
+      "name": "Aarav Patel",
+      "email": "aarav@studymate.ai",
+      "passwordHash": "$2b$10$Rs136swUTXUgXfzdbA89HOvZJkPUPpsL9C0hUdCPcq3ueRLxRrFkK",
+      "createdAt": "2026-10-05T15:56:13.619Z",
+      "dailyStudyHours": 3,
+      "preferredStartTime": "16:00"
     }
   ],
   "subjects": [
@@ -50,6 +68,36 @@
       "priority": "Medium",
       "examDate": "2026-12-05",
       "createdAt": "2026-09-05T09:45:00.000Z"
+    },
+    {
+      "id": "sub-java-user-1791215773619",
+      "userId": "user-1791215773619",
+      "name": "Java Programming",
+      "description": "Core Java, OOP principles, Collections Framework, Exception Handling and Stream API.",
+      "difficulty": "Medium",
+      "priority": "High",
+      "examDate": "2026-10-19",
+      "createdAt": "2026-10-05T15:56:13.620Z"
+    },
+    {
+      "id": "sub-dsa-user-1791215773619",
+      "userId": "user-1791215773619",
+      "name": "Data Structures & Algorithms",
+      "description": "Arrays, Linked Lists, Trees, BST, Graphs, Sorting, and Dynamic Programming.",
+      "difficulty": "Hard",
+      "priority": "High",
+      "examDate": "2026-10-12",
+      "createdAt": "2026-10-05T15:56:13.620Z"
+    },
+    {
+      "id": "sub-dbms-user-1791215773619",
+      "userId": "user-1791215773619",
+      "name": "Database Management Systems",
+      "description": "Relational Model, SQL queries, Normalization, ACID Properties, and Indexing.",
+      "difficulty": "Medium",
+      "priority": "Medium",
+      "examDate": "2026-10-26",
+      "createdAt": "2026-10-05T15:56:13.620Z"
     }
   ],
   "materials": [
@@ -539,6 +587,30 @@
       "durationMinutes": 40,
       "status": "Pending",
       "priority": "Medium"
+    },
+    {
+      "id": "task-1-user-1791215773619",
+      "userId": "user-1791215773619",
+      "subjectId": "sub-dsa-user-1791215773619",
+      "subjectName": "Data Structures & Algorithms",
+      "topic": "Binary Trees & BST Traversals",
+      "scheduledDate": "2026-10-05",
+      "startTime": "16:00",
+      "durationMinutes": 60,
+      "status": "In Progress",
+      "priority": "High"
+    },
+    {
+      "id": "task-2-user-1791215773619",
+      "userId": "user-1791215773619",
+      "subjectId": "sub-java-user-1791215773619",
+      "subjectName": "Java Programming",
+      "topic": "Multithreading & Concurrency",
+      "scheduledDate": "2026-10-05",
+      "startTime": "17:15",
+      "durationMinutes": 45,
+      "status": "Pending",
+      "priority": "High"
     }
   ]
 }

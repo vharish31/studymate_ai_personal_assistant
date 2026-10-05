@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   GraduationCap,
   Sparkles,
@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Code2,
 } from 'lucide-react';
+import { AuthView } from './AuthView';
 
 interface LandingPageProps {
   onLogin: (email: string, pass: string) => Promise<void>;
@@ -27,47 +28,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onCloseAuthModal,
 }) => {
   const [modalMode, setModalMode] = useState<'login' | 'register' | null>(initialAuthModal);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [demoLoading, setDemoLoading] = useState(false);
+
+  // Synchronize modal state whenever the parent triggers auth from Navbar or elsewhere
+  useEffect(() => {
+    if (initialAuthModal) {
+      setModalMode(initialAuthModal);
+    }
+  }, [initialAuthModal]);
 
   const handleDemoLogin = async () => {
-    setLoading(true);
-    setError(null);
+    setDemoLoading(true);
     try {
       await onLogin('jashwanth@studymate.ai', 'password123');
     } catch (err: any) {
-      setError(err.message || 'Demo login failed');
+      console.error('Demo login error', err);
     } finally {
-      setLoading(false);
+      setDemoLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (modalMode === 'login') {
-        await onLogin(email, password);
-      } else if (modalMode === 'register') {
-        if (password !== confirmPassword) {
-          setError('Passwords do not match');
-          setLoading(false);
-          return;
-        }
-        await onRegister(name, email, password, confirmPassword);
-      }
-      setModalMode(null);
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed');
-    } finally {
-      setLoading(false);
-    }
+  const handleCloseModal = () => {
+    setModalMode(null);
+    onCloseAuthModal?.();
   };
 
   return (
@@ -90,14 +73,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           Your personalized intelligent study companion. Dynamically balances revision schedules using exam countdowns, subject difficulty, and real quiz diagnostic scores.
         </p>
 
-        {/* CTAs */}
+        {/* Primary Action Buttons: Sign In, Create Account & Demo */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
           <button
-            onClick={handleDemoLogin}
-            disabled={loading}
+            onClick={() => setModalMode('register')}
             className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-bold shadow-md shadow-indigo-100 hover:shadow-lg transition-all flex items-center gap-2"
           >
-            <span>{loading ? 'Entering Workspace...' : 'Explore Demo Workspace (Jashwanth)'}</span>
+            <span>Create Free Account</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
@@ -107,11 +89,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           >
             Student Sign In
           </button>
+
+          <button
+            onClick={handleDemoLogin}
+            disabled={demoLoading}
+            className="px-6 py-3.5 bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200/80 rounded-2xl text-sm font-semibold shadow-xs transition-colors flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-violet-500" />
+            <span>{demoLoading ? 'Entering Workspace...' : '1-Click Demo (Jashwanth)'}</span>
+          </button>
         </div>
 
         {/* Quick hint */}
         <p className="text-xs text-slate-400">
-          Pre-seeded with Java, DSA, DBMS & OS modules · No external API key required
+          Pre-seeded with Java, DSA, DBMS & OS modules · Real account creation & sign in available
         </p>
       </section>
 
@@ -178,12 +169,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          <button
-            onClick={handleDemoLogin}
-            className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-2xl text-xs shadow-md transition-colors whitespace-nowrap self-start md:self-auto"
-          >
-            Launch Prototype Now
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setModalMode('register')}
+              className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-2xl text-xs shadow-md transition-colors whitespace-nowrap"
+            >
+              Create Account
+            </button>
+            <button
+              onClick={() => setModalMode('login')}
+              className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl text-xs border border-slate-700 transition-colors whitespace-nowrap"
+            >
+              Sign In
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-800 text-xs">
@@ -206,132 +205,41 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Auth Modal (Login / Register) */}
-      {modalMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 animate-scale-in">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-slate-900">
-                {modalMode === 'login' ? 'Student Sign In' : 'Create Free Account'}
-              </h3>
-              <button
-                onClick={() => {
-                  setModalMode(null);
-                  onCloseAuthModal?.();
-                }}
-                className="text-slate-400 hover:text-slate-600 text-lg"
-              >
-                ✕
-              </button>
-            </div>
-
-            {error && (
-              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {modalMode === 'register' && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Jashwanth"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="student@example.com"
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              {modalMode === 'register' && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Confirm Password *
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-sm transition-colors mt-2"
-              >
-                {loading
-                  ? 'Please wait...'
-                  : modalMode === 'login'
-                  ? 'Sign In to StudyMate'
-                  : 'Register Account'}
-              </button>
-
-              <div className="text-center pt-2">
-                {modalMode === 'login' ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalMode('register');
-                      setError(null);
-                    }}
-                    className="text-xs text-indigo-600 hover:underline"
-                  >
-                    Don't have an account? Sign Up
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalMode('login');
-                      setError(null);
-                    }}
-                    className="text-xs text-indigo-600 hover:underline"
-                  >
-                    Already have an account? Sign In
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
+      {/* Bottom CTA Banner */}
+      <section className="max-w-4xl mx-auto text-center space-y-6 bg-gradient-to-tr from-violet-100/70 via-white to-sky-100/70 p-10 rounded-3xl border border-indigo-100 shadow-sm">
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          Ready to Ace Your Semester Exams?
+        </h2>
+        <p className="text-sm text-slate-600 max-w-xl mx-auto">
+          Join StudyMate AI today. Sign up for free or sign in to review your personalized syllabus progress and study goals.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => setModalMode('register')}
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-100 transition-all flex items-center gap-2"
+          >
+            <span>Create Free Account</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setModalMode('login')}
+            className="px-6 py-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-xl text-xs font-semibold shadow-xs transition-colors"
+          >
+            Sign In
+          </button>
         </div>
+      </section>
+
+      {/* Auth Modal Popup */}
+      {modalMode && (
+        <AuthView
+          mode={modalMode}
+          onModeChange={(newMode) => setModalMode(newMode)}
+          onLogin={onLogin}
+          onRegister={onRegister}
+          isModal={true}
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );
