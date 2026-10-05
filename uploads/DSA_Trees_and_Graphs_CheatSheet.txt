@@ -1,0 +1,7 @@
+Data Structures and Algorithms Study Notes:
+Binary Trees: Hierarchical data structure where each node has at most two children (left and right).
+Binary Search Tree (BST): The left subtree contains only nodes with keys less than the node's key, and right contains keys greater. Inorder traversal of a BST produces sorted keys.
+Graph Representations: Adjacency Matrix O(V^2) space, Adjacency List O(V + E) space.
+BFS (Breadth First Search) utilizes a Queue and finds the shortest path in unweighted graphs.
+DFS (Depth First Search) uses recursion or a Stack.
+Dynamic Programming: Solves complex problems by breaking them into overlapping subproblems with optimal substructure. Common patterns include 0/1 Knapsack, Longest Common Subsequence, and Fibonacci numbers.

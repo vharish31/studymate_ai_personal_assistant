@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #FAF9F6;
+    color: #1E293B;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.font-plus-jakarta {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+#daily-study-hours-card #daily-study-hours-overlay,
+#daily-study-hours-card text,
+#daily-study-hours-overlay {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+#daily-study-hours-card circle,
+#daily-study-hours-card svg circle,
+#daily-study-hours-card circle[stroke-dashoffset],
+#daily-study-hours-card .progress-ring-circle,
+#daily-study-hours-card svg circle:nth-of-type(2) {
+  transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: stroke-dashoffset;
+  transition-duration: 1s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: stroke-dashoffset;
+}
+
+

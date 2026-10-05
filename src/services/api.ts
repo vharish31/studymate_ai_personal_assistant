@@ -1,0 +1,237 @@
+import { User, Subject, StudyMaterial, Quiz, QuizAttempt, StudyTask, ProgressData } from '../types';
+
+const TOKEN_KEY = 'studymate_auth_token';
+
+export const getAuthToken = (): string | null => {
+  return localStorage.getItem(TOKEN_KEY);
+};
+
+export const setAuthToken = (token: string): void => {
+  localStorage.setItem(TOKEN_KEY, token);
+};
+
+export const removeAuthToken = (): void => {
+  localStorage.removeItem(TOKEN_KEY);
+};
+
+async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
+  const token = getAuthToken();
+  const headers = new Headers(options.headers || {});
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  const response = await fetch(url, { ...options, headers });
+  if (response.status === 401) {
+    // unauthorized
+  }
+  return response;
+}
+
+export const api = {
+  // Auth
+  async getCurrentUser(): Promise<User | null> {
+    const res = await fetchWithAuth('/api/auth/me');
+    if (!res.ok) return null;
+    return res.json();
+  },
+
+  async login(email: string, password: string): Promise<{ token: string; user: User }> {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    setAuthToken(data.token);
+    return data;
+  },
+
+  async register(name: string, email: string, password: string, confirmPassword?: string): Promise<{ token: string; user: User }> {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, confirmPassword }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Registration failed');
+    setAuthToken(data.token);
+    return data;
+  },
+
+  async logout(): Promise<void> {
+    removeAuthToken();
+  },
+
+  // Subjects
+  async getSubjects(): Promise<Subject[]> {
+    const res = await fetchWithAuth('/api/subjects');
+    if (!res.ok) throw new Error('Failed to load subjects');
+    return res.json();
+  },
+
+  async createSubject(subject: Partial<Subject>): Promise<Subject> {
+    const res = await fetchWithAuth('/api/subjects', {
+      method: 'POST',
+      body: JSON.stringify(subject),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to create subject');
+    return data;
+  },
+
+  async updateSubject(id: string, subject: Partial<Subject>): Promise<Subject> {
+    const res = await fetchWithAuth(`/api/subjects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(subject),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to update subject');
+    return data;
+  },
+
+  async deleteSubject(id: string): Promise<void> {
+    const res = await fetchWithAuth(`/api/subjects/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete subject');
+  },
+
+  // Materials
+  async getMaterials(): Promise<StudyMaterial[]> {
+    const res = await fetchWithAuth('/api/materials');
+    if (!res.ok) throw new Error('Failed to fetch materials');
+    return res.json();
+  },
+
+  async uploadMaterial(file: File, subjectId: string): Promise<StudyMaterial> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('subjectId', subjectId);
+
+    const res = await fetchWithAuth('/api/materials/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to upload material');
+    return data;
+  },
+
+  async deleteMaterial(id: string): Promise<void> {
+    const res = await fetchWithAuth(`/api/materials/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete material');
+  },
+
+  // Study Plan
+  async getStudyPlan(): Promise<StudyTask[]> {
+    const res = await fetchWithAuth('/api/study-plan');
+    if (!res.ok) throw new Error('Failed to load study plan');
+    return res.json();
+  },
+
+  async generateStudyPlan(dailyHours: number, startTime: string): Promise<{ message: string; tasks: StudyTask[] }> {
+    const res = await fetchWithAuth('/api/study-plan/generate', {
+      method: 'POST',
+      body: JSON.stringify({ dailyHours, startTime }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to generate study plan');
+    return data;
+  },
+
+  async updateTaskStatus(id: string, status: 'Pending' | 'In Progress' | 'Completed'): Promise<StudyTask> {
+    const res = await fetchWithAuth(`/api/study-tasks/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to update task status');
+    return data;
+  },
+
+  // Quizzes
+  async getQuizAttempts(): Promise<QuizAttempt[]> {
+    const res = await fetchWithAuth('/api/quizzes');
+    if (!res.ok) throw new Error('Failed to load quiz attempts');
+    return res.json();
+  },
+
+  async generateQuiz(params: {
+    subjectId: string;
+    topic?: string;
+    numberOfQuestions?: number;
+    difficulty?: string;
+    materialId?: string;
+  }): Promise<Quiz> {
+    const res = await fetchWithAuth('/api/quizzes/generate', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to generate quiz');
+    return data;
+  },
+
+  async submitQuiz(quizId: string, answers: Record<string, number>): Promise<{
+    attempt: QuizAttempt;
+    questions: any[];
+    userAnswers: Record<string, number>;
+  }> {
+    const res = await fetchWithAuth(`/api/quizzes/${quizId}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ answers }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to submit quiz');
+    return data;
+  },
+
+  // Progress
+  async getProgress(): Promise<ProgressData> {
+    const res = await fetchWithAuth('/api/progress');
+    if (!res.ok) throw new Error('Failed to load progress data');
+    return res.json();
+  },
+
+  // AI Study Coach
+  async queryCoach(query: string): Promise<{ query: string; answer: string }> {
+    const res = await fetchWithAuth('/api/coach/query', {
+      method: 'POST',
+      body: JSON.stringify({ query }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to query study coach');
+    return data;
+  },
+
+  // Profile
+  async updateProfile(profileData: {
+    name?: string;
+    dailyStudyHours?: number;
+    preferredStartTime?: string;
+    password?: string;
+  }): Promise<User> {
+    const res = await fetchWithAuth('/api/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to update profile');
+    return data;
+  },
+
+  // Java Project Explorer
+  async getJavaFiles(): Promise<Array<{ path: string; name: string; content: string }>> {
+    const res = await fetchWithAuth('/api/java-files');
+    if (!res.ok) throw new Error('Failed to fetch Java project files');
+    const data = await res.json();
+    return data.files;
+  },
+};

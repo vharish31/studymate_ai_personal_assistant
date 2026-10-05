@@ -1,0 +1,544 @@
+{
+  "users": [
+    {
+      "id": "user-demo-1",
+      "name": "Jashwanth",
+      "email": "jashwanth@studymate.ai",
+      "passwordHash": "$2b$10$MENhH0n/WsNx/n1I9IOfcOBS6UTbJ5BAZ7jMTmHHcHhhtVkon8E8a",
+      "createdAt": "2026-09-01T08:00:00.000Z",
+      "dailyStudyHours": 3.5,
+      "preferredStartTime": "16:00"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "sub-java",
+      "userId": "user-demo-1",
+      "name": "Java Programming",
+      "description": "Core Java, OOP principles, Collections Framework, Exception Handling and Stream API.",
+      "difficulty": "Medium",
+      "priority": "High",
+      "examDate": "2026-11-20",
+      "createdAt": "2026-09-05T09:00:00.000Z"
+    },
+    {
+      "id": "sub-dsa",
+      "userId": "user-demo-1",
+      "name": "Data Structures & Algorithms",
+      "description": "Arrays, Trees, Graphs, Sorting, Dynamic Programming, and complexity analysis.",
+      "difficulty": "Hard",
+      "priority": "High",
+      "examDate": "2026-11-15",
+      "createdAt": "2026-09-05T09:15:00.000Z"
+    },
+    {
+      "id": "sub-dbms",
+      "userId": "user-demo-1",
+      "name": "Database Management Systems",
+      "description": "Relational algebra, SQL, Normalization 1NF to BCNF, ACID transactions, and Indexing.",
+      "difficulty": "Medium",
+      "priority": "Medium",
+      "examDate": "2026-11-25",
+      "createdAt": "2026-09-05T09:30:00.000Z"
+    },
+    {
+      "id": "sub-os",
+      "userId": "user-demo-1",
+      "name": "Operating Systems",
+      "description": "Processes, CPU Scheduling, Concurrency & Deadlocks, Memory Management, and Virtual Memory.",
+      "difficulty": "Hard",
+      "priority": "Medium",
+      "examDate": "2026-12-05",
+      "createdAt": "2026-09-05T09:45:00.000Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat-1",
+      "userId": "user-demo-1",
+      "subjectId": "sub-java",
+      "fileName": "Java_OOP_and_Collections_Mastery.txt",
+      "filePath": "/app/applet/uploads/Java_OOP_and_Collections_Mastery.txt",
+      "fileType": "text/plain",
+      "fileSize": 875,
+      "uploadDate": "2026-09-10T10:00:00.000Z",
+      "extractedText": "Java Object-Oriented Programming (OOP) and Collections Guide:\nEncapsulation wraps data (attributes) and code (methods) together into a single unit. Use private variables with public getters and setters to protect class integrity.\nInheritance enables code reuse using the 'extends' keyword. Polymorphism allows methods to perform different tasks based on the object invoking them (method overloading at compile time, method overriding at runtime).\nAbstraction hides internal details using abstract classes and interfaces.\nCollections Framework: ArrayList offers fast indexed access O(1), LinkedList provides fast insertions/deletions. HashSet guarantees unique elements with O(1) average lookup.\nTreeMap maintains keys sorted in natural order using Red-Black trees.\nMultithreading uses Runnable or Thread. Synchronization protects critical sections to prevent race conditions.",
+      "extractedTopics": [
+        "OOP Concepts",
+        "Inheritance & Polymorphism",
+        "Collections Framework",
+        "Multithreading"
+      ],
+      "extractedKeywords": [
+        "Encapsulation",
+        "Polymorphism",
+        "ArrayList",
+        "TreeMap",
+        "Synchronization"
+      ]
+    },
+    {
+      "id": "mat-2",
+      "userId": "user-demo-1",
+      "subjectId": "sub-dsa",
+      "fileName": "DSA_Trees_and_Graphs_CheatSheet.txt",
+      "filePath": "/app/applet/uploads/DSA_Trees_and_Graphs_CheatSheet.txt",
+      "fileType": "text/plain",
+      "fileSize": 763,
+      "uploadDate": "2026-09-12T11:30:00.000Z",
+      "extractedText": "Data Structures and Algorithms Study Notes:\nBinary Trees: Hierarchical data structure where each node has at most two children (left and right).\nBinary Search Tree (BST): The left subtree contains only nodes with keys less than the node's key, and right contains keys greater. Inorder traversal of a BST produces sorted keys.\nGraph Representations: Adjacency Matrix O(V^2) space, Adjacency List O(V + E) space.\nBFS (Breadth First Search) utilizes a Queue and finds the shortest path in unweighted graphs.\nDFS (Depth First Search) uses recursion or a Stack.\nDynamic Programming: Solves complex problems by breaking them into overlapping subproblems with optimal substructure. Common patterns include 0/1 Knapsack, Longest Common Subsequence, and Fibonacci numbers.",
+      "extractedTopics": [
+        "Binary Trees",
+        "Binary Search Tree",
+        "Graph Traversals (BFS/DFS)",
+        "Dynamic Programming"
+      ],
+      "extractedKeywords": [
+        "BST",
+        "Inorder",
+        "Queue",
+        "Adjacency List",
+        "Knapsack"
+      ]
+    },
+    {
+      "id": "mat-3",
+      "userId": "user-demo-1",
+      "subjectId": "sub-dbms",
+      "fileName": "DBMS_Normalization_and_Transactions.txt",
+      "filePath": "/app/applet/uploads/DBMS_Normalization_and_Transactions.txt",
+      "fileType": "text/plain",
+      "fileSize": 793,
+      "uploadDate": "2026-09-15T14:10:00.000Z",
+      "extractedText": "Database Management Systems - Normalization and Concurrency:\nFunctional Dependency (FD): A constraint between two sets of attributes.\n1NF (First Normal Form): All attributes contain atomic values; no repeating groups.\n2NF: In 1NF and no non-prime attribute is partially dependent on any candidate key.\n3NF: In 2NF and no non-prime attribute transitively depends on a candidate key.\nBCNF (Boyce-Codd Normal Form): For every non-trivial functional dependency X -> Y, X must be a super key.\nACID Properties: Atomicity (all or nothing), Consistency (valid state transitions), Isolation (independent concurrent transactions), Durability (committed changes persist).\nB+ Trees: Balanced search tree where all values reside at leaf nodes, connected via linked list pointers for rapid sequential scans.",
+      "extractedTopics": [
+        "1NF, 2NF, 3NF & BCNF",
+        "ACID Transactions",
+        "B+ Tree Indexing"
+      ],
+      "extractedKeywords": [
+        "Functional Dependency",
+        "Atomicity",
+        "Isolation",
+        "Super Key",
+        "B+ Tree"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "top-1",
+      "subjectId": "sub-java",
+      "name": "OOP Concepts & Encapsulation"
+    },
+    {
+      "id": "top-2",
+      "subjectId": "sub-java",
+      "name": "Inheritance & Polymorphism"
+    },
+    {
+      "id": "top-3",
+      "subjectId": "sub-java",
+      "name": "Collections & Generics"
+    },
+    {
+      "id": "top-4",
+      "subjectId": "sub-java",
+      "name": "Exception Handling"
+    },
+    {
+      "id": "top-5",
+      "subjectId": "sub-java",
+      "name": "Multithreading & Concurrency"
+    },
+    {
+      "id": "top-6",
+      "subjectId": "sub-dsa",
+      "name": "Binary Search & Arrays"
+    },
+    {
+      "id": "top-7",
+      "subjectId": "sub-dsa",
+      "name": "Binary Trees & BST Traversals"
+    },
+    {
+      "id": "top-8",
+      "subjectId": "sub-dsa",
+      "name": "Graph Traversal (BFS & DFS)"
+    },
+    {
+      "id": "top-9",
+      "subjectId": "sub-dsa",
+      "name": "Dynamic Programming Patterns"
+    },
+    {
+      "id": "top-10",
+      "subjectId": "sub-dbms",
+      "name": "SQL Joins & Aggregations"
+    },
+    {
+      "id": "top-11",
+      "subjectId": "sub-dbms",
+      "name": "Normalization (1NF, 2NF, 3NF, BCNF)"
+    },
+    {
+      "id": "top-12",
+      "subjectId": "sub-dbms",
+      "name": "ACID Properties & Transactions"
+    },
+    {
+      "id": "top-13",
+      "subjectId": "sub-dbms",
+      "name": "B-Trees & Indexing"
+    },
+    {
+      "id": "top-14",
+      "subjectId": "sub-os",
+      "name": "Process Synchronization & Semaphores"
+    },
+    {
+      "id": "top-15",
+      "subjectId": "sub-os",
+      "name": "CPU Scheduling Algorithms"
+    },
+    {
+      "id": "top-16",
+      "subjectId": "sub-os",
+      "name": "Deadlock Detection & Prevention"
+    },
+    {
+      "id": "top-17",
+      "subjectId": "sub-os",
+      "name": "Paging & Virtual Memory"
+    }
+  ],
+  "questionBank": [
+    {
+      "id": "q-j1",
+      "subjectId": "sub-java",
+      "topic": "OOP Concepts & Encapsulation",
+      "difficulty": "Easy",
+      "questionText": "Which OOP principle is primarily achieved by declaring class fields private and providing public getters and setters?",
+      "options": [
+        "Encapsulation",
+        "Polymorphism",
+        "Inheritance",
+        "Abstraction"
+      ],
+      "correctAnswerIndex": 0,
+      "explanation": "Encapsulation wraps state and behavior into a single unit while hiding internal representation using access modifiers."
+    },
+    {
+      "id": "q-j2",
+      "subjectId": "sub-java",
+      "topic": "Inheritance & Polymorphism",
+      "difficulty": "Medium",
+      "questionText": "In Java, which keyword prevents a method from being overridden in any subclass?",
+      "options": [
+        "static",
+        "final",
+        "abstract",
+        "synchronized"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "The final keyword when applied to a method prevents subclasses from overriding it."
+    },
+    {
+      "id": "q-j3",
+      "subjectId": "sub-java",
+      "topic": "Collections & Generics",
+      "difficulty": "Medium",
+      "questionText": "Which collection class in Java maintains key-value pairs sorted in natural or custom comparator order?",
+      "options": [
+        "HashMap",
+        "LinkedHashMap",
+        "TreeMap",
+        "Hashtable"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "TreeMap is implemented using a Red-Black tree and maintains keys in sorted order."
+    },
+    {
+      "id": "q-j4",
+      "subjectId": "sub-java",
+      "topic": "Exception Handling",
+      "difficulty": "Easy",
+      "questionText": "Which block in Java exception handling always executes regardless of whether an exception was caught?",
+      "options": [
+        "try",
+        "catch",
+        "finally",
+        "throw"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "The finally block executes whether an exception occurs or not, typically used for cleanup."
+    },
+    {
+      "id": "q-j5",
+      "subjectId": "sub-java",
+      "topic": "Multithreading & Concurrency",
+      "difficulty": "Hard",
+      "questionText": "What is the effect of the volatile keyword on a variable in Java?",
+      "options": [
+        "It makes the variable immutable",
+        "It guarantees reads and writes are read directly from main memory rather than CPU cache",
+        "It locks the entire object during execution",
+        "It automatically synchronizes all method calls"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "volatile ensures visibility of changes across threads by prohibiting cache storage and forcing reads/writes from main memory."
+    },
+    {
+      "id": "q-d1",
+      "subjectId": "sub-dsa",
+      "topic": "Binary Search & Arrays",
+      "difficulty": "Easy",
+      "questionText": "What is the worst-case time complexity of Binary Search on a sorted array of size n?",
+      "options": [
+        "O(1)",
+        "O(n)",
+        "O(log n)",
+        "O(n log n)"
+      ],
+      "correctAnswerIndex": 2,
+      "explanation": "Binary Search halves the search space in each iteration, resulting in O(log n) time complexity."
+    },
+    {
+      "id": "q-d2",
+      "subjectId": "sub-dsa",
+      "topic": "Binary Trees & BST Traversals",
+      "difficulty": "Medium",
+      "questionText": "Which tree traversal on a Binary Search Tree (BST) visits nodes in strictly ascending numerical order?",
+      "options": [
+        "Preorder Traversal",
+        "Inorder Traversal",
+        "Postorder Traversal",
+        "Level Order Traversal"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "Inorder traversal (Left, Root, Right) on a valid BST outputs the elements in sorted ascending order."
+    },
+    {
+      "id": "q-d3",
+      "subjectId": "sub-dsa",
+      "topic": "Graph Traversal (BFS & DFS)",
+      "difficulty": "Medium",
+      "questionText": "Which data structure is primarily utilized in Breadth-First Search (BFS) of a graph?",
+      "options": [
+        "Stack",
+        "Queue",
+        "PriorityQueue",
+        "Disjoint Set"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "BFS uses a FIFO Queue to visit neighbors level-by-level."
+    },
+    {
+      "id": "q-d4",
+      "subjectId": "sub-dsa",
+      "topic": "Dynamic Programming Patterns",
+      "difficulty": "Hard",
+      "questionText": "What are the two mandatory properties required for a problem to be solvable via Dynamic Programming?",
+      "options": [
+        "Optimal substructure and overlapping subproblems",
+        "Greedy choice property and disjoint subsets",
+        "Divide and conquer with independent subproblems",
+        "Depth-first search with memoization"
+      ],
+      "correctAnswerIndex": 0,
+      "explanation": "Dynamic Programming requires both optimal substructure (optimal solution composed of optimal subsolutions) and overlapping subproblems."
+    },
+    {
+      "id": "q-d5",
+      "subjectId": "sub-dsa",
+      "topic": "Binary Trees & BST Traversals",
+      "difficulty": "Hard",
+      "questionText": "In an AVL Tree, what is the maximum allowable height difference between left and right subtrees of any node?",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "log(n)"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "AVL trees enforce a balance factor of -1, 0, or +1 for every node."
+    },
+    {
+      "id": "q-db1",
+      "subjectId": "sub-dbms",
+      "topic": "Normalization (1NF, 2NF, 3NF, BCNF)",
+      "difficulty": "Medium",
+      "questionText": "A relation is in 2NF if it is in 1NF and contains no:",
+      "options": [
+        "Transitive dependencies",
+        "Partial functional dependencies on candidate keys",
+        "Multi-valued dependencies",
+        "Foreign key cycles"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "2NF removes partial functional dependencies where a non-prime attribute depends on a proper subset of a candidate key."
+    },
+    {
+      "id": "q-db2",
+      "subjectId": "sub-dbms",
+      "topic": "ACID Properties & Transactions",
+      "difficulty": "Easy",
+      "questionText": "Which ACID property guarantees that all operations within a database transaction either complete entirely or are fully rolled back?",
+      "options": [
+        "Atomicity",
+        "Consistency",
+        "Isolation",
+        "Durability"
+      ],
+      "correctAnswerIndex": 0,
+      "explanation": "Atomicity ensures the all-or-nothing execution of a transaction."
+    },
+    {
+      "id": "q-db3",
+      "subjectId": "sub-dbms",
+      "topic": "B-Trees & Indexing",
+      "difficulty": "Hard",
+      "questionText": "Why are B+ Trees preferred over standard Binary Search Trees for disk-based relational database indexes?",
+      "options": [
+        "They occupy less memory in RAM",
+        "They have higher fan-out, reducing disk I/O seek operations for range queries",
+        "They do not require balancing upon insertion",
+        "They store data strictly in contiguous memory"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "B+ Trees have a high branching factor (fanout), shallow tree height, and linked leaf nodes for rapid range scans."
+    },
+    {
+      "id": "q-os1",
+      "subjectId": "sub-os",
+      "topic": "Process Synchronization & Semaphores",
+      "difficulty": "Medium",
+      "questionText": "What is a race condition in operating systems?",
+      "options": [
+        "When CPU scheduling runs too quickly for I/O devices",
+        "When multiple processes access and manipulate shared data concurrently and the outcome depends on execution order",
+        "When memory runs out during process swapping",
+        "When two processes wait indefinitely for each other"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "A race condition arises when concurrent threads read and write shared data without proper synchronization."
+    },
+    {
+      "id": "q-os2",
+      "subjectId": "sub-os",
+      "topic": "Deadlock Detection & Prevention",
+      "difficulty": "Hard",
+      "questionText": "Which algorithm is used in operating systems for deadlock avoidance by verifying whether allocating resources maintains a 'safe state'?",
+      "options": [
+        "Dijkstra's Algorithm",
+        "Banker's Algorithm",
+        "Round Robin Algorithm",
+        "Peterson's Algorithm"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "Dijkstra's Banker's Algorithm simulates resource allocation to check for safe execution states before granting requests."
+    },
+    {
+      "id": "q-os3",
+      "subjectId": "sub-os",
+      "topic": "Paging & Virtual Memory",
+      "difficulty": "Medium",
+      "questionText": "What hardware cache is used by the Memory Management Unit (MMU) to accelerate virtual-to-physical address translation?",
+      "options": [
+        "L1 Cache",
+        "Translation Lookaside Buffer (TLB)",
+        "Page Table Descriptor",
+        "Segment Register"
+      ],
+      "correctAnswerIndex": 1,
+      "explanation": "The TLB is a high-speed associative hardware cache for recent virtual-to-physical page mappings."
+    }
+  ],
+  "quizzes": [],
+  "quizAttempts": [
+    {
+      "id": "att-1",
+      "userId": "user-demo-1",
+      "quizId": "quiz-init-dsa",
+      "subjectId": "sub-dsa",
+      "subjectName": "Data Structures & Algorithms",
+      "score": 5,
+      "totalQuestions": 10,
+      "percentage": 50,
+      "attemptedAt": "2026-10-02T16:30:00.000Z",
+      "weakTopics": [
+        "Binary Trees & BST Traversals",
+        "Graph Traversal (BFS & DFS)"
+      ],
+      "feedback": "Needs urgent attention! Binary Tree balancing and graph search requires deeper revision before your exam."
+    },
+    {
+      "id": "att-2",
+      "userId": "user-demo-1",
+      "quizId": "quiz-init-java",
+      "subjectId": "sub-java",
+      "subjectName": "Java Programming",
+      "score": 9,
+      "totalQuestions": 10,
+      "percentage": 90,
+      "attemptedAt": "2026-10-03T18:00:00.000Z",
+      "weakTopics": [
+        "Multithreading & Concurrency"
+      ],
+      "feedback": "Great performance! Retain momentum and review concurrency edge cases."
+    },
+    {
+      "id": "att-3",
+      "userId": "user-demo-1",
+      "quizId": "quiz-init-dbms",
+      "subjectId": "sub-dbms",
+      "subjectName": "Database Management Systems",
+      "score": 7,
+      "totalQuestions": 10,
+      "percentage": 70,
+      "attemptedAt": "2026-10-04T19:15:00.000Z",
+      "weakTopics": [
+        "Normalization (1NF, 2NF, 3NF, BCNF)"
+      ],
+      "feedback": "Decent grasp of fundamentals. Practice 3NF and BCNF decomposition examples."
+    }
+  ],
+  "studyTasks": [
+    {
+      "id": "task-1",
+      "userId": "user-demo-1",
+      "subjectId": "sub-dsa",
+      "subjectName": "Data Structures & Algorithms",
+      "topic": "Binary Trees & BST Traversals",
+      "scheduledDate": "2026-10-05",
+      "startTime": "16:00",
+      "durationMinutes": 60,
+      "status": "In Progress",
+      "priority": "High"
+    },
+    {
+      "id": "task-2",
+      "userId": "user-demo-1",
+      "subjectId": "sub-java",
+      "subjectName": "Java Programming",
+      "topic": "Multithreading & Concurrency",
+      "scheduledDate": "2026-10-05",
+      "startTime": "17:15",
+      "durationMinutes": 45,
+      "status": "Pending",
+      "priority": "High"
+    },
+    {
+      "id": "task-3",
+      "userId": "user-demo-1",
+      "subjectId": "sub-dbms",
+      "subjectName": "Database Management Systems",
+      "topic": "Normalization (1NF, 2NF, 3NF, BCNF)",
+      "scheduledDate": "2026-10-05",
+      "startTime": "18:15",
+      "durationMinutes": 40,
+      "status": "Pending",
+      "priority": "Medium"
+    }
+  ]
+}

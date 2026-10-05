@@ -1,0 +1,6 @@
+{
+  "name": "StudyMate AI",
+  "description": "Adaptive Intelligent Study Planner for college students with personalized schedules, quizzes, material analysis, and full Java Spring Boot architecture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

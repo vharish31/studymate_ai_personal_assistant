@@ -1,0 +1,7 @@
+Java Object-Oriented Programming (OOP) and Collections Guide:
+Encapsulation wraps data (attributes) and code (methods) together into a single unit. Use private variables with public getters and setters to protect class integrity.
+Inheritance enables code reuse using the 'extends' keyword. Polymorphism allows methods to perform different tasks based on the object invoking them (method overloading at compile time, method overriding at runtime).
+Abstraction hides internal details using abstract classes and interfaces.
+Collections Framework: ArrayList offers fast indexed access O(1), LinkedList provides fast insertions/deletions. HashSet guarantees unique elements with O(1) average lookup.
+TreeMap maintains keys sorted in natural order using Red-Black trees.
+Multithreading uses Runnable or Thread. Synchronization protects critical sections to prevent race conditions.

@@ -1,0 +1,8 @@
+Database Management Systems - Normalization and Concurrency:
+Functional Dependency (FD): A constraint between two sets of attributes.
+1NF (First Normal Form): All attributes contain atomic values; no repeating groups.
+2NF: In 1NF and no non-prime attribute is partially dependent on any candidate key.
+3NF: In 2NF and no non-prime attribute transitively depends on a candidate key.
+BCNF (Boyce-Codd Normal Form): For every non-trivial functional dependency X -> Y, X must be a super key.
+ACID Properties: Atomicity (all or nothing), Consistency (valid state transitions), Isolation (independent concurrent transactions), Durability (committed changes persist).
+B+ Trees: Balanced search tree where all values reside at leaf nodes, connected via linked list pointers for rapid sequential scans.
