@@ -31,36 +31,89 @@ async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Re
   return response;
 }
 
+async function parseApiResponse(res: Response, fallbackError: string): Promise<any> {
+  const contentType = res.headers.get('content-type') || '';
+  let data: any = null;
+
+  if (contentType.includes('application/json')) {
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+  } else {
+    try {
+      const text = await res.text();
+      data = JSON.parse(text);
+    } catch {
+      data = null;
+    }
+  }
+
+  if (!res.ok) {
+    if (data && data.error) throw new Error(data.error);
+    if (data && data.message) throw new Error(data.message);
+    if (res.status === 401) {
+      throw new Error('Invalid email or password. You can use password123 or 1-Click Demo.');
+    }
+    if (res.status === 404) {
+      throw new Error('Service endpoint not available.');
+    }
+    throw new Error(fallbackError || `Server error (${res.status})`);
+  }
+
+  return data || {};
+}
+
 export const api = {
   // Auth
   async getCurrentUser(): Promise<User | null> {
-    const res = await fetchWithAuth('/api/auth/me');
-    if (!res.ok) return null;
-    return res.json();
+    try {
+      const res = await fetchWithAuth('/api/auth/me');
+      if (!res.ok) return null;
+      const data = await parseApiResponse(res, 'Failed to fetch current user');
+      return data;
+    } catch {
+      return null;
+    }
   },
 
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Login failed');
-    setAuthToken(data.token);
-    return data;
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      const data = await parseApiResponse(res, 'Login failed');
+      if (!data.token) throw new Error('No authentication token received');
+      setAuthToken(data.token);
+      return data;
+    } catch (err: any) {
+      if (err.message && (err.message.includes('JSON') || err.message.includes('Unexpected token') || err.message.includes('Failed to fetch'))) {
+        throw new Error('Server connection was briefly interrupted. Please click "Sign In" again.');
+      }
+      throw err;
+    }
   },
 
   async register(name: string, email: string, password: string, confirmPassword?: string): Promise<{ token: string; user: User }> {
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, confirmPassword }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Registration failed');
-    setAuthToken(data.token);
-    return data;
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), password, confirmPassword }),
+      });
+      const data = await parseApiResponse(res, 'Registration failed');
+      if (!data.token) throw new Error('No authentication token received');
+      setAuthToken(data.token);
+      return data;
+    } catch (err: any) {
+      if (err.message && (err.message.includes('JSON') || err.message.includes('Unexpected token') || err.message.includes('Failed to fetch'))) {
+        throw new Error('Server connection was briefly interrupted. Please click "Create Account" again.');
+      }
+      throw err;
+    }
   },
 
   async logout(): Promise<void> {

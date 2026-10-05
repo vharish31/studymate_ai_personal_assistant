@@ -324,27 +324,76 @@ export const AuthView: React.FC<AuthViewProps> = ({
         </button>
       </form>
 
-      {/* Demo Credentials Quick-Fill helper for easy evaluation */}
+      {/* Demo Credentials & Quick Access */}
       {mode === 'login' && (
-        <div className="mt-5 pt-4 border-t border-slate-100 space-y-2">
+        <div className="mt-5 pt-4 border-t border-slate-100 space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500 font-medium">Testing or Demo account:</span>
+            <span className="text-slate-500 font-semibold">Pre-configured Accounts:</span>
+            <span className="text-[11px] text-slate-500 font-mono bg-slate-100 px-2 py-0.5 rounded-md">Password: password123</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={handleFillDemo}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold underline underline-offset-2"
+              onClick={() => {
+                setEmail('admin@studymate.ai');
+                setPassword('password123');
+                setError(null);
+              }}
+              className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-colors"
             >
-              Fill Demo Credentials
+              <div className="text-[11px] font-bold text-slate-800">Admin Account</div>
+              <div className="text-[10px] text-slate-500 truncate">admin@studymate.ai</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('user@studymate.ai');
+                setPassword('password123');
+                setError(null);
+              }}
+              className="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-left transition-colors"
+            >
+              <div className="text-[11px] font-bold text-slate-800">User Account</div>
+              <div className="text-[10px] text-slate-500 truncate">user@studymate.ai</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('jashwanthprabha07@gmail.com');
+                setPassword('password123');
+                setError(null);
+              }}
+              className="p-2.5 bg-violet-50/70 hover:bg-violet-100/70 border border-violet-200/80 rounded-xl text-left transition-colors"
+            >
+              <div className="text-[11px] font-bold text-violet-900">Your Account</div>
+              <div className="text-[10px] text-violet-600 truncate">jashwanthprabha07@...</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('jashwanth@studymate.ai');
+                setPassword('password123');
+                setError(null);
+              }}
+              className="p-2.5 bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-200/80 rounded-xl text-left transition-colors"
+            >
+              <div className="text-[11px] font-bold text-indigo-900">Demo Student</div>
+              <div className="text-[10px] text-indigo-600 truncate">jashwanth@studymate.ai</div>
             </button>
           </div>
+
           <button
             type="button"
             onClick={handleDirectDemoLogin}
             disabled={loading}
-            className="w-full py-2 px-3 bg-violet-50 hover:bg-violet-100/80 text-violet-700 border border-violet-200/80 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            className="w-full py-2 px-3 bg-gradient-to-r from-violet-50 to-indigo-50 hover:from-violet-100 hover:to-indigo-100 text-indigo-700 border border-indigo-200/80 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Sparkles className="w-3.5 h-3.5 text-violet-500" />
-            <span>1-Click Sign In as Demo Student (Jashwanth)</span>
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span>1-Click Instant Demo Login</span>
           </button>
         </div>
       )}

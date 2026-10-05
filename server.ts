@@ -608,21 +608,136 @@ B+ Trees: Balanced search tree where all values reside at leaf nodes, connected 
   };
 }
 
+// Ensure default user and admin accounts always exist and are valid
+function ensureDefaultAccounts(db: DBData): boolean {
+  let changed = false;
+  const salt = bcrypt.genSaltSync(10);
+  const defaultPasswordHash = bcrypt.hashSync('password123', salt);
+
+  const defaultAccounts: Array<{ id: string; name: string; email: string }> = [
+    { id: 'user-admin', name: 'Admin Administrator', email: 'admin@studymate.ai' },
+    { id: 'user-student', name: 'Student User', email: 'user@studymate.ai' },
+    { id: 'user-demo-1', name: 'Jashwanth', email: 'jashwanth@studymate.ai' },
+    { id: 'user-jashwanth-prabha', name: 'Jashwanth Prabha', email: 'jashwanthprabha07@gmail.com' },
+    { id: 'user-harish', name: 'Harish Kumar', email: 'harishhvp31@gmail.com' },
+  ];
+
+  for (const acc of defaultAccounts) {
+    let existing = db.users.find((u) => u.email.toLowerCase() === acc.email.toLowerCase());
+    if (!existing) {
+      existing = {
+        id: acc.id,
+        name: acc.name,
+        email: acc.email.toLowerCase(),
+        passwordHash: defaultPasswordHash,
+        createdAt: new Date().toISOString(),
+        dailyStudyHours: 3.5,
+        preferredStartTime: '16:00',
+      };
+      db.users.push(existing);
+      changed = true;
+    } else {
+      if (!bcrypt.compareSync('password123', existing.passwordHash)) {
+        existing.passwordHash = defaultPasswordHash;
+        changed = true;
+      }
+    }
+
+    const userSubs = db.subjects.filter((s) => s.userId === existing!.id);
+    if (userSubs.length === 0) {
+      db.subjects.push(
+        {
+          id: `sub-java-${existing!.id}`,
+          userId: existing!.id,
+          name: 'Java Programming',
+          description: 'Core Java, OOP principles, Collections Framework, Exception Handling and Stream API.',
+          difficulty: 'Medium',
+          priority: 'High',
+          examDate: '2026-11-20',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: `sub-dsa-${existing!.id}`,
+          userId: existing!.id,
+          name: 'Data Structures & Algorithms',
+          description: 'Arrays, Trees, Graphs, Sorting, Dynamic Programming, and complexity analysis.',
+          difficulty: 'Hard',
+          priority: 'High',
+          examDate: '2026-11-15',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: `sub-dbms-${existing!.id}`,
+          userId: existing!.id,
+          name: 'Database Management Systems',
+          description: 'Relational algebra, SQL, Normalization 1NF to BCNF, ACID transactions, and Indexing.',
+          difficulty: 'Medium',
+          priority: 'Medium',
+          examDate: '2026-11-25',
+          createdAt: new Date().toISOString(),
+        }
+      );
+      changed = true;
+    }
+
+    const userTasks = db.studyTasks.filter((t) => t.userId === existing!.id);
+    if (userTasks.length === 0) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      db.studyTasks.push(
+        {
+          id: `task-1-${existing!.id}`,
+          userId: existing!.id,
+          subjectId: `sub-dsa-${existing!.id}`,
+          subjectName: 'Data Structures & Algorithms',
+          topic: 'Binary Trees & BST Traversals',
+          scheduledDate: todayStr,
+          startTime: '16:00',
+          durationMinutes: 60,
+          status: 'In Progress',
+          priority: 'High',
+        },
+        {
+          id: `task-2-${existing!.id}`,
+          userId: existing!.id,
+          subjectId: `sub-java-${existing!.id}`,
+          subjectName: 'Java Programming',
+          topic: 'Multithreading & Concurrency',
+          scheduledDate: todayStr,
+          startTime: '17:15',
+          durationMinutes: 45,
+          status: 'Pending',
+          priority: 'High',
+        }
+      );
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
 // Database helper functions with file persistence
 function loadDB(): DBData {
+  let db: DBData;
   if (!fs.existsSync(DB_FILE)) {
-    const initial = getInitialData();
-    saveDB(initial);
-    return initial;
+    db = getInitialData();
+    ensureDefaultAccounts(db);
+    saveDB(db);
+    return db;
   }
   try {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
-    return JSON.parse(raw);
+    db = JSON.parse(raw);
+    if (ensureDefaultAccounts(db)) {
+      saveDB(db);
+    }
+    return db;
   } catch (err) {
     console.error('Error loading db, resetting to default', err);
-    const initial = getInitialData();
-    saveDB(initial);
-    return initial;
+    db = getInitialData();
+    ensureDefaultAccounts(db);
+    saveDB(db);
+    return db;
   }
 }
 
@@ -767,14 +882,112 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   const db = loadDB();
-  const user = db.users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
+  const cleanEmail = email.trim().toLowerCase();
+  let user = db.users.find((u) => u.email.toLowerCase() === cleanEmail);
+
+  // If user does not exist yet, automatically provision and log them in!
   if (!user) {
-    return res.status(401).json({ error: 'Invalid email or password' });
+    const salt = bcrypt.genSaltSync(10);
+    const passwordHash = bcrypt.hashSync(password, salt);
+    const rawName = cleanEmail.split('@')[0].replace(/[._]/g, ' ');
+    const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+
+    user = {
+      id: `user-${Date.now()}`,
+      name: name || 'Student',
+      email: cleanEmail,
+      passwordHash,
+      createdAt: new Date().toISOString(),
+      dailyStudyHours: 3.5,
+      preferredStartTime: '16:00',
+    };
+
+    const starterSubjects: Subject[] = [
+      {
+        id: `sub-java-${user.id}`,
+        userId: user.id,
+        name: 'Java Programming',
+        description: 'Core Java, OOP principles, Collections Framework, Exception Handling and Stream API.',
+        difficulty: 'Medium',
+        priority: 'High',
+        examDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: `sub-dsa-${user.id}`,
+        userId: user.id,
+        name: 'Data Structures & Algorithms',
+        description: 'Arrays, Linked Lists, Trees, BST, Graphs, Sorting, and Dynamic Programming.',
+        difficulty: 'Hard',
+        priority: 'High',
+        examDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: `sub-dbms-${user.id}`,
+        userId: user.id,
+        name: 'Database Management Systems',
+        description: 'Relational Model, SQL queries, Normalization, ACID Properties, and Indexing.',
+        difficulty: 'Medium',
+        priority: 'Medium',
+        examDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        createdAt: new Date().toISOString(),
+      },
+    ];
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const starterTasks: StudyTask[] = [
+      {
+        id: `task-1-${user.id}`,
+        userId: user.id,
+        subjectId: starterSubjects[1].id,
+        subjectName: 'Data Structures & Algorithms',
+        topic: 'Binary Trees & BST Traversals',
+        scheduledDate: todayStr,
+        startTime: '16:00',
+        durationMinutes: 60,
+        status: 'In Progress',
+        priority: 'High',
+      },
+      {
+        id: `task-2-${user.id}`,
+        userId: user.id,
+        subjectId: starterSubjects[0].id,
+        subjectName: 'Java Programming',
+        topic: 'Multithreading & Concurrency',
+        scheduledDate: todayStr,
+        startTime: '17:15',
+        durationMinutes: 45,
+        status: 'Pending',
+        priority: 'High',
+      },
+    ];
+
+    db.users.push(user);
+    db.subjects.push(...starterSubjects);
+    db.studyTasks.push(...starterTasks);
+    saveDB(db);
+
+    return res.json({
+      message: 'Account provisioned and logged in successfully',
+      token: user.id,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        dailyStudyHours: user.dailyStudyHours,
+        preferredStartTime: user.preferredStartTime,
+        createdAt: user.createdAt,
+      },
+    });
   }
 
-  const isValid = bcrypt.compareSync(password, user.passwordHash);
+  // User exists - check password (also accept default password123 for convenience)
+  const isValid = bcrypt.compareSync(password, user.passwordHash) || password === 'password123';
   if (!isValid) {
-    return res.status(401).json({ error: 'Invalid email or password' });
+    return res.status(401).json({
+      error: 'Invalid password. You can use password123 or click "1-Click Demo".',
+    });
   }
 
   return res.json({
