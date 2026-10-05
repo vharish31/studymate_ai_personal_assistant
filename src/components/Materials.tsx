@@ -89,28 +89,28 @@ export const Materials: React.FC<MaterialsProps> = ({
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Study Material Library</h1>
-        <p className="text-sm text-slate-500 mt-0.5">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Study Material Library</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
           Upload course notes, textbook chapters, or syllabus guides in PDF, DOCX, or TXT format.
         </p>
       </div>
 
       {/* Upload Box */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
-        <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <Upload className="w-4 h-4 text-indigo-600" />
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+          <Upload className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           <span>Upload & Analyze Material</span>
         </h2>
 
         {error && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+          <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700 flex items-center gap-2">
+          <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
             <CheckCircle className="w-4 h-4 shrink-0" />
             <span>{success}</span>
           </div>
@@ -119,13 +119,13 @@ export const Materials: React.FC<MaterialsProps> = ({
         <form onSubmit={handleUpload} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Assign to Subject *
               </label>
               <select
                 value={selectedSubjectId}
                 onChange={(e) => setSelectedSubjectId(e.target.value)}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white transition-colors"
               >
                 {subjects.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -136,14 +136,14 @@ export const Materials: React.FC<MaterialsProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 Choose Document (PDF, DOCX, TXT) *
               </label>
               <input
                 type="file"
                 accept=".pdf,.docx,.txt"
                 onChange={handleFileChange}
-                className="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                className="w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-950/60 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-100 cursor-pointer"
               />
             </div>
           </div>
@@ -168,9 +168,9 @@ export const Materials: React.FC<MaterialsProps> = ({
         </h2>
 
         {materials.length === 0 ? (
-          <div className="bg-white p-12 text-center rounded-3xl border border-slate-200/80">
-            <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm text-slate-500">No study materials uploaded yet.</p>
+          <div className="bg-white dark:bg-slate-900 p-12 text-center rounded-3xl border border-slate-200/80 dark:border-slate-800 transition-colors">
+            <FileText className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+            <p className="text-sm text-slate-500 dark:text-slate-400">No study materials uploaded yet.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -181,17 +181,17 @@ export const Materials: React.FC<MaterialsProps> = ({
               return (
                 <div
                   key={mat.id}
-                  className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm transition-all hover:border-slate-300"
+                  className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all hover:border-slate-300 dark:hover:border-slate-700"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
                         <FileText className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900">{mat.fileName}</h3>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 mt-1">
-                          <span className="font-medium text-indigo-600">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white">{mat.fileName}</h3>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 dark:text-slate-400 mt-1">
+                          <span className="font-medium text-indigo-600 dark:text-indigo-400">
                             {subject?.name || 'General Subject'}
                           </span>
                           <span>·</span>
@@ -207,16 +207,16 @@ export const Materials: React.FC<MaterialsProps> = ({
                         onClick={() =>
                           onGenerateQuizFromMaterial(mat.subjectId, mat.id)
                         }
-                        className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
+                        className="px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                         <span>Generate Quiz</span>
                       </button>
 
                       <a
                         href={`/api/materials/${mat.id}/download`}
                         download
-                        className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                        className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                         title="Download file"
                       >
                         <Download className="w-4 h-4" />
@@ -224,7 +224,7 @@ export const Materials: React.FC<MaterialsProps> = ({
 
                       <button
                         onClick={() => onDeleteMaterial(mat.id)}
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                        className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
                         title="Delete material"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -234,7 +234,7 @@ export const Materials: React.FC<MaterialsProps> = ({
                         onClick={() =>
                           setExpandedMaterialId(isExpanded ? null : mat.id)
                         }
-                        className="p-2 text-slate-400 hover:text-slate-700 rounded-lg"
+                        className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg transition-colors"
                         title="Toggle Text Analysis"
                       >
                         {isExpanded ? (
@@ -248,15 +248,15 @@ export const Materials: React.FC<MaterialsProps> = ({
 
                   {/* Extracted Keywords Preview */}
                   {mat.extractedKeywords && mat.extractedKeywords.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-xs">
-                      <span className="text-slate-400 mr-1 flex items-center gap-1">
+                    <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-1.5 text-xs">
+                      <span className="text-slate-400 dark:text-slate-500 mr-1 flex items-center gap-1">
                         <Tag className="w-3 h-3" />
                         <span>Keywords:</span>
                       </span>
                       {mat.extractedKeywords.map((kw, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px]"
+                          className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px]"
                         >
                           {kw}
                         </span>
@@ -266,12 +266,12 @@ export const Materials: React.FC<MaterialsProps> = ({
 
                   {/* Expanded Analysis Drawer */}
                   {isExpanded && (
-                    <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-3">
+                    <div className="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs space-y-3">
                       <div>
-                        <h4 className="font-bold text-slate-800 mb-1">
+                        <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-1">
                           Extracted Key Concepts & Topics:
                         </h4>
-                        <ul className="list-disc list-inside space-y-0.5 text-slate-600">
+                        <ul className="list-disc list-inside space-y-0.5 text-slate-600 dark:text-slate-300">
                           {mat.extractedTopics?.map((t, idx) => (
                             <li key={idx}>{t}</li>
                           )) || <li>Core definitions parsed from document.</li>}
@@ -279,8 +279,8 @@ export const Materials: React.FC<MaterialsProps> = ({
                       </div>
 
                       <div>
-                        <h4 className="font-bold text-slate-800 mb-1">Extracted Text Preview:</h4>
-                        <div className="max-h-40 overflow-y-auto p-3 bg-white rounded-xl border border-slate-200 font-mono text-[11px] text-slate-700 leading-relaxed whitespace-pre-wrap">
+                        <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-1">Extracted Text Preview:</h4>
+                        <div className="max-h-40 overflow-y-auto p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 font-mono text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
                           {mat.extractedText || 'No text extracted.'}
                         </div>
                       </div>

@@ -69,26 +69,26 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Top Banner & Generation Controller */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-colors">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-indigo-600">
+          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
             <Sparkles className="w-4 h-4" />
             <span className="text-xs font-semibold uppercase tracking-wider">
               Adaptive Algorithm Powered
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             Intelligent Weekly Study Plan
           </h1>
-          <p className="text-sm text-slate-500 max-w-xl">
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl">
             Schedules are dynamically prioritized: high weakness & approaching exams receive longer revision blocks and prime study hours.
           </p>
         </div>
 
         {/* Plan Parameters Controls */}
-        <div className="flex flex-wrap items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+        <div className="flex flex-wrap items-center gap-4 bg-slate-50 dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200/70 dark:border-slate-700 transition-colors">
           <div>
-            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
               Daily Study Target
             </label>
             <div className="flex items-center gap-2">
@@ -101,21 +101,21 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
                 onChange={(e) => setDailyHours(parseFloat(e.target.value))}
                 className="w-24 accent-indigo-600 cursor-pointer"
               />
-              <span className="text-xs font-bold text-slate-800 w-12 tabular-nums">
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 w-12 tabular-nums">
                 {dailyHours} hrs
               </span>
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
               Start Time
             </label>
             <input
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+              className="px-2.5 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
             />
           </div>
 
@@ -144,13 +144,13 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
               className={`px-4 py-3 rounded-2xl text-left transition-all shrink-0 border ${
                 isSelected
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/80'
+                  : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-800'
               }`}
             >
               <div className="text-xs font-semibold">{d.dayName}</div>
               <div
                 className={`text-[11px] mt-0.5 ${
-                  isSelected ? 'text-indigo-100' : 'text-slate-400'
+                  isSelected ? 'text-indigo-100' : 'text-slate-400 dark:text-slate-400'
                 }`}
               >
                 {d.displayDate}
@@ -163,13 +163,13 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
                         ? 'text-emerald-300 font-bold'
                         : isSelected
                         ? 'text-indigo-200'
-                        : 'text-slate-500'
+                        : 'text-slate-500 dark:text-slate-400'
                     }
                   >
                     {completedCount}/{dayTasks.length} Done
                   </span>
                 ) : (
-                  <span className={isSelected ? 'text-indigo-200' : 'text-slate-400'}>
+                  <span className={isSelected ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-400'}>
                     Free Day
                   </span>
                 )}
@@ -180,23 +180,23 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
       </div>
 
       {/* Filter and Content Header */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold text-slate-900">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">
               Schedule for {days[selectedDayOffset]?.dayName} ({days[selectedDayOffset]?.displayDate})
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {currentTasks.length} tasks scheduled · Check off tasks as you finish them
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">Filter Subject:</span>
+            <span className="text-xs text-slate-400 dark:text-slate-400">Filter Subject:</span>
             <select
               value={filterSubject}
               onChange={(e) => setFilterSubject(e.target.value)}
-              className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white"
+              className="text-xs px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
             >
               <option value="all">All Subjects</option>
               {subjects.map((s) => (
@@ -210,8 +210,8 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
 
         {currentTasks.length === 0 ? (
           <div className="p-12 text-center">
-            <CalendarDays className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm text-slate-500">
+            <CalendarDays className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               No tasks scheduled for this day or filter.
             </p>
             <button
@@ -222,7 +222,7 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {currentTasks.map((task) => {
               const isCompleted = task.status === 'Completed';
 
@@ -230,7 +230,9 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
                 <div
                   key={task.id}
                   className={`p-5 flex items-center justify-between gap-4 transition-colors ${
-                    isCompleted ? 'bg-slate-50/50' : 'hover:bg-slate-50/40'
+                    isCompleted
+                      ? 'bg-slate-50/50 dark:bg-slate-800/30'
+                      : 'hover:bg-slate-50/40 dark:hover:bg-slate-800/40'
                   }`}
                 >
                   <div className="flex items-start gap-4">
@@ -239,7 +241,7 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
                       className={`mt-0.5 w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${
                         isCompleted
                           ? 'bg-emerald-600 border-emerald-600 text-white'
-                          : 'border-slate-300 hover:border-indigo-500 bg-white text-transparent'
+                          : 'border-slate-300 dark:border-slate-600 hover:border-indigo-500 bg-white dark:bg-slate-800 text-transparent'
                       }`}
                     >
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
@@ -249,22 +251,24 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
                       <div className="flex items-center gap-2">
                         <span
                           className={`text-sm font-semibold ${
-                            isCompleted ? 'line-through text-slate-400' : 'text-slate-900'
+                            isCompleted
+                              ? 'line-through text-slate-400 dark:text-slate-500'
+                              : 'text-slate-900 dark:text-white'
                           }`}
                         >
                           {task.topic}
                         </span>
                         {task.priority === 'High' && (
-                          <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded">
                             High Priority
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                        <span className="font-medium text-slate-600">{task.subjectName}</span>
+                      <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-400 mt-1">
+                        <span className="font-medium text-slate-600 dark:text-slate-300">{task.subjectName}</span>
                         <span>·</span>
-                        <span className="font-mono text-slate-500">{task.startTime}</span>
+                        <span className="font-mono text-slate-500 dark:text-slate-400">{task.startTime}</span>
                         <span>·</span>
                         <span>{task.durationMinutes} minutes</span>
                       </div>
@@ -275,10 +279,10 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
                     <span
                       className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                         task.status === 'Completed'
-                          ? 'bg-emerald-50 text-emerald-700'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
                           : task.status === 'In Progress'
-                          ? 'bg-amber-50 text-amber-700'
-                          : 'bg-slate-100 text-slate-600'
+                          ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                       }`}
                     >
                       {task.status}
@@ -292,14 +296,14 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
       </div>
 
       {/* Mathematical Algorithm Proof Box for PBL evaluation */}
-      <div className="p-6 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3">
-        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-indigo-600" />
+      <div className="p-6 rounded-3xl bg-slate-50/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 space-y-3 transition-colors">
+        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           <span>College PBL Feature: The Adaptive Multi-Factor Scheduling Formula</span>
         </h3>
-        <p className="text-xs text-slate-600 leading-relaxed">
+        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
           The study plan is mathematically determined using:
-          <code className="mx-1 px-1.5 py-0.5 bg-white border border-slate-200 rounded font-mono text-indigo-700">
+          <code className="mx-1 px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded font-mono text-indigo-700 dark:text-indigo-300">
             TotalWeight = W_exam × W_priority × W_difficulty × W_quizWeakness
           </code>
           . When quiz scores drop below 60%, the system automatically flags missed topics and schedules urgent revision slots prior to approaching exams.

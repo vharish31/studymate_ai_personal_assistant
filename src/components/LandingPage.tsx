@@ -57,19 +57,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     <div className="space-y-24 py-8 animate-fade-in">
       {/* Hero Section */}
       <section className="text-center max-w-4xl mx-auto space-y-6 pt-8">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 border border-violet-200/80 text-violet-700 text-xs font-semibold shadow-xs">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-950/50 border border-violet-200/80 dark:border-violet-900/60 text-violet-700 dark:text-violet-300 text-xs font-semibold shadow-xs">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Intelligent College PBL & Capstone Project</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+        <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15]">
           Master Your Syllabus with{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-indigo-600 to-sky-500">
             StudyMate AI
           </span>
         </h1>
 
-        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
           Your personalized intelligent study companion. Dynamically balances revision schedules using exam countdowns, subject difficulty, and real quiz diagnostic scores.
         </p>
 
@@ -77,7 +77,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
           <button
             onClick={() => setModalMode('register')}
-            className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-bold shadow-md shadow-indigo-100 hover:shadow-lg transition-all flex items-center gap-2"
+            className="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-bold shadow-md shadow-indigo-100 dark:shadow-none hover:shadow-lg transition-all flex items-center gap-2"
           >
             <span>Create Free Account</span>
             <ArrowRight className="w-4 h-4" />
@@ -85,7 +85,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           <button
             onClick={() => setModalMode('login')}
-            className="px-6 py-3.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-2xl text-sm font-semibold shadow-xs transition-colors"
+            className="px-6 py-3.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm font-semibold shadow-xs transition-colors"
           >
             Student Sign In
           </button>
@@ -93,7 +93,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <button
             onClick={handleDemoLogin}
             disabled={demoLoading}
-            className="px-6 py-3.5 bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200/80 rounded-2xl text-sm font-semibold shadow-xs transition-colors flex items-center gap-2"
+            className="px-6 py-3.5 bg-violet-50 dark:bg-violet-950/50 hover:bg-violet-100 dark:hover:bg-violet-900/50 text-violet-700 dark:text-violet-300 border border-violet-200/80 dark:border-violet-900/60 rounded-2xl text-sm font-semibold shadow-xs transition-colors flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-violet-500" />
             <span>{demoLoading ? 'Entering Workspace...' : '1-Click Demo (Jashwanth)'}</span>
@@ -101,7 +101,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Quick hint */}
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
           Pre-seeded with Java, DSA, DBMS & OS modules · Real account creation & sign in available
         </p>
       </section>
@@ -109,44 +109,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Feature Showcase Grid */}
       <section id="features" className="max-w-6xl mx-auto space-y-12">
         <div className="text-center space-y-2">
-          <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
+          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
             Intelligent Study Architecture
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             Engineered for Continuous Academic Progress
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1 */}
-          <div className="bg-white p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 hover:border-indigo-200 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 hover:border-indigo-200 dark:hover:border-indigo-900 transition-colors">
+            <div className="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 flex items-center justify-center">
               <Calendar className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Adaptive Study Planning</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Adaptive Study Planning</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Calculates daily timetable slots using exam proximity, subject priority, and quiz weakness multipliers rather than rigid static calendars.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className="bg-white p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 hover:border-indigo-200 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 hover:border-indigo-200 dark:hover:border-indigo-900 transition-colors">
+            <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center">
               <FileText className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Smart Material Analysis</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Smart Material Analysis</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Upload PDF, DOCX, or TXT study notes. Automatically parses readable text, extracts high-frequency keywords, and creates custom quizzes.
             </p>
           </div>
 
           {/* Card 3 */}
-          <div className="bg-white p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 hover:border-indigo-200 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 hover:border-indigo-200 dark:hover:border-indigo-900 transition-colors">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <Award className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Subject-Wise Quizzes</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Subject-Wise Quizzes</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Two levels of testing: Curated question banks and dynamic material generation. Diagnose weak concepts and receive immediate feedback.
             </p>
           </div>
@@ -200,30 +200,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
           <div>
             <span className="text-slate-400 block">Design Aesthetic</span>
-            <span className="font-semibold text-slate-200">Canva-Style Pastel Light</span>
+            <span className="font-semibold text-slate-200">Canva-Style Pastel Light & Dark</span>
           </div>
         </div>
       </section>
 
       {/* Bottom CTA Banner */}
-      <section className="max-w-4xl mx-auto text-center space-y-6 bg-gradient-to-tr from-violet-100/70 via-white to-sky-100/70 p-10 rounded-3xl border border-indigo-100 shadow-sm">
-        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
+      <section className="max-w-4xl mx-auto text-center space-y-6 bg-gradient-to-tr from-violet-100/70 via-white to-sky-100/70 dark:from-slate-900 dark:via-slate-900/90 dark:to-indigo-950/50 p-10 rounded-3xl border border-indigo-100 dark:border-slate-800 shadow-sm transition-colors">
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
           Ready to Ace Your Semester Exams?
         </h2>
-        <p className="text-sm text-slate-600 max-w-xl mx-auto">
+        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
           Join StudyMate AI today. Sign up for free or sign in to review your personalized syllabus progress and study goals.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={() => setModalMode('register')}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-100 transition-all flex items-center gap-2"
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-100 dark:shadow-none transition-all flex items-center gap-2"
           >
             <span>Create Free Account</span>
             <ArrowRight className="w-4 h-4" />
           </button>
           <button
             onClick={() => setModalMode('login')}
-            className="px-6 py-3 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 rounded-xl text-xs font-semibold shadow-xs transition-colors"
+            className="px-6 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold shadow-xs transition-colors"
           >
             Sign In
           </button>

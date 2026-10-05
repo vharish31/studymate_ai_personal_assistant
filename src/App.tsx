@@ -50,6 +50,33 @@ export default function App() {
   const [preselectedQuizSubject, setPreselectedQuizSubject] = useState<string | undefined>(undefined);
   const [preselectedQuizMaterial, setPreselectedQuizMaterial] = useState<string | undefined>(undefined);
 
+  // Global Theme state (persisted in localStorage)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('studymate_theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+      document.body.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
+      document.body.classList.remove('dark');
+    }
+    localStorage.setItem('studymate_theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   // Check auth on mount
   useEffect(() => {
     checkAuth();
@@ -212,17 +239,17 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF9F6] dark:bg-slate-950 flex items-center justify-center transition-colors">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-semibold text-slate-700">Loading StudyMate AI...</span>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Loading StudyMate AI...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-slate-800 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#FAF9F6] dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 transition-colors duration-200">
       {/* Top Bar Contract (3 zones) */}
       <Navbar
         user={user}
@@ -230,6 +257,8 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenAuth={(mode) => setAuthModalMode(mode)}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Container */}
@@ -345,38 +374,38 @@ export default function App() {
 
       {/* Mobile Bottom Navigation Bar (Visible on mobile viewports for quick switching) */}
       {user && (
-        <div className="md:hidden sticky bottom-0 z-40 bg-white/95 backdrop-blur-sm border-t border-slate-200 px-2 py-2 flex items-center justify-around text-[10px] text-slate-500">
+        <div className="md:hidden sticky bottom-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-slate-200 dark:border-slate-800 px-2 py-2 flex items-center justify-around text-[10px] text-slate-500 dark:text-slate-400">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex flex-col items-center gap-1 ${activeTab === 'dashboard' ? 'text-indigo-600 font-bold' : ''}`}
+            className={`flex flex-col items-center gap-1 ${activeTab === 'dashboard' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}`}
           >
             <LayoutDashboard className="w-4 h-4" />
             <span>Home</span>
           </button>
           <button
             onClick={() => setActiveTab('planner')}
-            className={`flex flex-col items-center gap-1 ${activeTab === 'planner' ? 'text-indigo-600 font-bold' : ''}`}
+            className={`flex flex-col items-center gap-1 ${activeTab === 'planner' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}`}
           >
             <CalendarDays className="w-4 h-4" />
             <span>Planner</span>
           </button>
           <button
             onClick={() => setActiveTab('quizzes')}
-            className={`flex flex-col items-center gap-1 ${activeTab === 'quizzes' ? 'text-indigo-600 font-bold' : ''}`}
+            className={`flex flex-col items-center gap-1 ${activeTab === 'quizzes' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}`}
           >
             <HelpCircle className="w-4 h-4" />
             <span>Quizzes</span>
           </button>
           <button
             onClick={() => setActiveTab('coach')}
-            className={`flex flex-col items-center gap-1 ${activeTab === 'coach' ? 'text-indigo-600 font-bold' : ''}`}
+            className={`flex flex-col items-center gap-1 ${activeTab === 'coach' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}`}
           >
             <Bot className="w-4 h-4" />
             <span>Coach</span>
           </button>
           <button
             onClick={() => setActiveTab('java-hub')}
-            className={`flex flex-col items-center gap-1 ${activeTab === 'java-hub' ? 'text-emerald-600 font-bold' : ''}`}
+            className={`flex flex-col items-center gap-1 ${activeTab === 'java-hub' ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}`}
           >
             <Code2 className="w-4 h-4" />
             <span>Java PBL</span>
