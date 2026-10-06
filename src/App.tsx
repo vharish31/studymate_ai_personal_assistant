@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api, getAuthToken } from './services/api';
 import {
   User,
@@ -21,6 +21,8 @@ import { StudyCoach } from './components/StudyCoach';
 import { JavaProjectHub } from './components/JavaProjectHub';
 import { ProfileView } from './components/ProfileView';
 import { LandingPage } from './components/LandingPage';
+import { NotificationToast } from './components/NotificationToast';
+import { notificationService, AppNotification } from './services/notificationService';
 import {
   LayoutDashboard,
   BookOpen,
@@ -75,6 +77,101 @@ export default function App() {
 
   const handleToggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  // 15-Minute Web-Notification System States
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [activeToast, setActiveToast] = useState<AppNotification | null>(null);
+
+  const handleDismissToast = useCallback(() => {
+    setActiveToast(null);
+  }, []);
+
+  const handleNavigateToPlannerFromToast = useCallback(() => {
+    setActiveTab('planner');
+  }, []);
+
+  // Background reminder checker loop (polls studyTasks every 10 seconds for tasks due/starting in 15 minutes)
+  useEffect(() => {
+    if (!studyTasks || studyTasks.length === 0) return;
+
+    const checkReminders = () => {
+      notificationService.checkAndNotifyTasks(studyTasks, (notif) => {
+        setNotifications((prev) => [notif, ...prev]);
+        setActiveToast(notif);
+      });
+    };
+
+    // Immediate check
+    checkReminders();
+
+    // Regular polling interval
+    const interval = setInterval(checkReminders, 10000);
+
+    return () => clearInterval(interval);
+  }, [studyTasks]);
+
+  const handleSendTestReminder = (customTask?: StudyTask) => {
+    const task =
+      customTask ||
+      studyTasks[0] || {
+        id: `task-test-${Date.now()}`,
+        userId: user?.id || 'demo',
+        subjectId: subjects[0]?.id || 'sub-dsa',
+        subjectName: subjects[0]?.name || 'Data Structures & Algorithms',
+        topic: 'Binary Trees & BST Traversals',
+        scheduledDate: new Date().toISOString().split('T')[0],
+        startTime: '16:00',
+        durationMinutes: 45,
+        status: 'Pending',
+        priority: 'High',
+      };
+
+    const res = notificationService.dispatchTaskReminder(task, 'due');
+    const notif: AppNotification = {
+      id: `notif-test-${Date.now()}`,
+      taskId: task.id,
+      title: res.title,
+      message: res.message,
+      subjectName: task.subjectName,
+      topic: task.topic,
+      scheduledTime: task.startTime,
+      timestamp: Date.now(),
+      read: false,
+      type: 'test',
+    };
+    setNotifications((prev) => [notif, ...prev]);
+    setActiveToast(notif);
+  };
+
+  const handleSimulateUpcomingTask = () => {
+    const now = new Date();
+    // Schedule 15 minutes from current time
+    const target = new Date(now.getTime() + 15 * 60 * 1000);
+    const dateStr = target.toISOString().split('T')[0];
+    const hours = target.getHours();
+    const minutes = target.getMinutes();
+    const formattedHour = hours > 12 ? `${hours - 12}` : `${hours === 0 ? 12 : hours}`;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedTime = `${formattedHour}:${minutes < 10 ? '0' : ''}${minutes} ${ampm}`;
+
+    const simTask: StudyTask = {
+      id: `task-sim-${Date.now()}`,
+      userId: user?.id || 'demo',
+      subjectId: subjects[0]?.id || 'sub-java',
+      subjectName: subjects[0]?.name || 'Java Programming',
+      topic: 'Live 15-Minute Advance Reminder Demo',
+      scheduledDate: dateStr,
+      startTime: formattedTime,
+      durationMinutes: 45,
+      status: 'Pending',
+      priority: 'High',
+    };
+
+    setStudyTasks((prev) => [simTask, ...prev]);
+    notificationService.resetNotifiedHistory();
+    // Trigger immediate reminder alert for this simulated task
+    handleSendTestReminder(simTask);
   };
 
   // Check auth on mount
@@ -200,6 +297,20 @@ export default function App() {
     setProgress(prog);
   };
 
+  const handleLogFocus = async (
+    taskId: string,
+    minutes: number,
+    completeTask: boolean = false
+  ) => {
+    const res = await api.logFocusSession(taskId, minutes, completeTask);
+    if (res.task) {
+      setStudyTasks((prev) => prev.map((t) => (t.id === res.task!.id ? res.task! : t)));
+    }
+    const prog = await api.getProgress();
+    setProgress(prog);
+    return res;
+  };
+
   // Quiz Handlers
   const handleGenerateQuiz = async (params: {
     subjectId: string;
@@ -259,6 +370,11 @@ export default function App() {
         onOpenAuth={(mode) => setAuthModalMode(mode)}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        notifications={notifications}
+        upcomingTasks={studyTasks.filter((t) => t.status !== 'Completed')}
+        onClearNotifications={() => setNotifications([])}
+        onSendTestReminder={() => handleSendTestReminder()}
+        onSimulateUpcomingTask={handleSimulateUpcomingTask}
       />
 
       {/* Main Container */}
@@ -298,6 +414,7 @@ export default function App() {
                 onUpdateTaskStatus={handleUpdateTaskStatus}
                 onNavigate={setActiveTab}
                 onRefreshPlan={() => handleGeneratePlan(user.dailyStudyHours || 3, user.preferredStartTime || '16:00')}
+                onLogFocus={handleLogFocus}
               />
             )}
 
@@ -328,6 +445,8 @@ export default function App() {
                 studyTasks={studyTasks}
                 onGeneratePlan={handleGeneratePlan}
                 onUpdateTaskStatus={handleUpdateTaskStatus}
+                onSendTestReminder={handleSendTestReminder}
+                onSimulateUpcomingTask={handleSimulateUpcomingTask}
               />
             )}
 
@@ -412,6 +531,13 @@ export default function App() {
           </button>
         </div>
       )}
+
+      {/* In-App 15-Minute Task Advance Notification Toast */}
+      <NotificationToast
+        notification={activeToast}
+        onDismiss={handleDismissToast}
+        onNavigateToPlanner={handleNavigateToPlannerFromToast}
+      />
     </div>
   );
 }

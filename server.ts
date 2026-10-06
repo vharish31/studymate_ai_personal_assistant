@@ -146,6 +146,14 @@ export interface StudyTask {
   priority: 'Low' | 'Medium' | 'High';
 }
 
+export interface FocusSession {
+  id: string;
+  userId: string;
+  taskId?: string;
+  minutes: number;
+  timestamp: string;
+}
+
 export interface DBData {
   users: User[];
   subjects: Subject[];
@@ -155,6 +163,7 @@ export interface DBData {
   quizzes: Quiz[];
   quizAttempts: QuizAttempt[];
   studyTasks: StudyTask[];
+  focusSessions?: FocusSession[];
 }
 
 // Seed initial comprehensive question bank & sample demo account
@@ -605,6 +614,7 @@ B+ Trees: Balanced search tree where all values reside at leaf nodes, connected 
     quizzes: [],
     quizAttempts,
     studyTasks,
+    focusSessions: [],
   };
 }
 
@@ -711,6 +721,24 @@ function ensureDefaultAccounts(db: DBData): boolean {
       );
       changed = true;
     }
+
+    const userFocus = (db.focusSessions || []).filter((f) => f.userId === existing!.id);
+    if (userFocus.length === 0) {
+      db.focusSessions = db.focusSessions || [];
+      const pastMinutesPattern = [45, 60, 35, 75, 50, 65, 30]; // 6 days ago up to today
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        d.setHours(16, 30, 0, 0);
+        db.focusSessions.push({
+          id: `focus-seed-${existing!.id}-${i}`,
+          userId: existing!.id,
+          minutes: pastMinutesPattern[i],
+          timestamp: d.toISOString(),
+        });
+      }
+      changed = true;
+    }
   }
 
   return changed;
@@ -728,6 +756,7 @@ function loadDB(): DBData {
   try {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
     db = JSON.parse(raw);
+    db.focusSessions = db.focusSessions || [];
     if (ensureDefaultAccounts(db)) {
       saveDB(db);
     }
@@ -1547,9 +1576,18 @@ app.get('/api/progress', (req, res) => {
   const completedTasks = userTasks.filter((t) => t.status === 'Completed').length;
   const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  const totalStudyMinutes = userTasks
+  const userFocusSessions = (db.focusSessions || []).filter((f) => f.userId === user.id);
+  const totalFocusMins = userFocusSessions.reduce((acc, f) => acc + (f.minutes || 0), 0);
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayFocusSessions = userFocusSessions.filter((f) => f.timestamp && f.timestamp.startsWith(todayStr));
+  const todayFocusMins = todayFocusSessions.reduce((acc, f) => acc + (f.minutes || 0), 0);
+
+  const completedTaskMins = userTasks
     .filter((t) => t.status === 'Completed')
     .reduce((acc, t) => acc + t.durationMinutes, 0);
+
+  const totalStudyMinutes = completedTaskMins + totalFocusMins;
   const totalStudyHours = +(totalStudyMinutes / 60).toFixed(1);
 
   const attempts = db.quizAttempts.filter((a) => a.userId === user.id);
@@ -1588,16 +1626,36 @@ app.get('/api/progress', (req, res) => {
     .sort((a, b) => b[1] - a[1])
     .map(([topic, count]) => ({ topic, missedCount: count }));
 
-  const todayStr = new Date().toISOString().split('T')[0];
   const todayTasks = userTasks.filter((t) => t.scheduledDate === todayStr);
-  const todayStudyMinutes = todayTasks
+  const todayCompletedTaskMins = todayTasks
     .filter((t) => t.status === 'Completed')
     .reduce((acc, t) => acc + t.durationMinutes, 0);
+
+  const todayStudyMinutes = todayCompletedTaskMins + todayFocusMins;
   const todayStudyHours = +(todayStudyMinutes / 60).toFixed(1);
   const dailyGoalHours = user.dailyStudyHours || 3.0;
-  // If no tasks completed today yet, fall back gracefully to a proportional part or todayStudyHours
-  const effectiveTodayHours = todayStudyHours > 0 ? todayStudyHours : Math.min(dailyGoalHours, +(totalStudyHours % dailyGoalHours || 1.5).toFixed(1));
+  // If no tasks completed today yet and no focus sessions, provide baseline or todayStudyHours
+  const effectiveTodayHours =
+    todayStudyHours > 0
+      ? todayStudyHours
+      : Math.min(dailyGoalHours, +(totalStudyHours % dailyGoalHours || 1.5).toFixed(1));
   const dailyGoalPercentage = Math.min(100, Math.round((effectiveTodayHours / dailyGoalHours) * 100));
+
+  // Past 7 days focus duration trends
+  const focusWeeklyTrends = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    const dateStr = d.toISOString().split('T')[0];
+    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+    const daySessions = userFocusSessions.filter((f) => f.timestamp && f.timestamp.startsWith(dateStr));
+    const dayMinutes = daySessions.reduce((acc, f) => acc + (f.minutes || 0), 0);
+    return {
+      date: dateStr,
+      dayName,
+      minutes: dayMinutes,
+      sessionsCount: daySessions.length,
+    };
+  });
 
   return res.json({
     totalTasks,
@@ -1614,6 +1672,52 @@ app.get('/api/progress', (req, res) => {
     totalQuizzesTaken: attempts.length,
     subjectPerformance,
     weakTopics,
+    totalFocusedMinutes: totalFocusMins,
+    todayFocusedMinutes: todayFocusMins,
+    focusSessionsCount: userFocusSessions.length,
+    focusWeeklyTrends,
+  });
+});
+
+// Endpoint to log focused Pomodoro minutes to the user's progress record
+app.post('/api/progress/log-focus', (req, res) => {
+  const db = loadDB();
+  const user = getUserFromToken(req, db);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
+  const { taskId, minutes = 25, completeTask = false } = req.body;
+  const focusedMins = Math.max(1, parseInt(minutes, 10) || 25);
+
+  db.focusSessions = db.focusSessions || [];
+  const session: FocusSession = {
+    id: `focus-${Date.now()}`,
+    userId: user.id,
+    taskId,
+    minutes: focusedMins,
+    timestamp: new Date().toISOString(),
+  };
+  db.focusSessions.push(session);
+
+  let updatedTask: StudyTask | undefined;
+  if (taskId) {
+    const task = db.studyTasks.find((t) => t.id === taskId && t.userId === user.id);
+    if (task) {
+      if (completeTask) {
+        task.status = 'Completed';
+      } else if (task.status === 'Pending') {
+        task.status = 'In Progress';
+      }
+      updatedTask = task;
+    }
+  }
+
+  saveDB(db);
+
+  return res.json({
+    success: true,
+    message: `Logged ${focusedMins} focused minutes to progress record!`,
+    session,
+    task: updatedTask,
   });
 });
 

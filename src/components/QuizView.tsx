@@ -13,8 +13,10 @@ import {
   BookOpen,
   Calendar,
   AlertCircle,
+  Layers,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { FlashcardMode } from './FlashcardMode';
 
 interface QuizViewProps {
   subjects: Subject[];
@@ -47,6 +49,9 @@ export const QuizView: React.FC<QuizViewProps> = ({
   preselectedSubjectId,
   preselectedMaterialId,
 }) => {
+  // Active mode state: 'quizzes' | 'flashcards'
+  const [viewTab, setViewTab] = useState<'quizzes' | 'flashcards'>('quizzes');
+
   // Generation state
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(
     preselectedSubjectId || subjects[0]?.id || ''
@@ -148,7 +153,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
     return (
       <div className="max-w-3xl mx-auto space-y-6 animate-scale-in">
         {/* Score Header Card */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-200/80 shadow-sm text-center space-y-4">
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-center space-y-4 transition-colors">
           <div
             className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-white ${
               attempt.percentage >= 80
@@ -162,28 +167,28 @@ export const QuizView: React.FC<QuizViewProps> = ({
           </div>
 
           <div>
-            <span className="text-xs uppercase tracking-wider font-semibold text-slate-400">
+            <span className="text-xs uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500">
               Quiz Completed · {attempt.subjectName}
             </span>
-            <h2 className="text-4xl font-extrabold text-slate-900 mt-1 tabular-nums">
+            <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white mt-1 tabular-nums">
               {attempt.score} / {attempt.totalQuestions}
             </h2>
-            <div className="text-lg font-bold text-indigo-600 mt-0.5 tabular-nums">
+            <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5 tabular-nums">
               {attempt.percentage}% Score
             </div>
           </div>
 
-          <p className="text-sm text-slate-600 max-w-lg mx-auto bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+          <p className="text-sm text-slate-600 dark:text-slate-300 max-w-lg mx-auto bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/70 dark:border-slate-800">
             {attempt.feedback}
           </p>
 
           {attempt.weakTopics && attempt.weakTopics.length > 0 && (
-            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-left space-y-1.5">
-              <h4 className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-left space-y-1.5">
+              <h4 className="text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5" />
                 <span>Adaptive Attention Triggered:</span>
               </h4>
-              <p className="text-xs text-amber-800">
+              <p className="text-xs text-amber-800 dark:text-amber-300">
                 Missed topics (
                 <span className="font-semibold">{attempt.weakTopics.join(', ')}</span>) have been
                 automatically scheduled for targeted revision in your Study Planner!
@@ -207,7 +212,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
 
         {/* Detailed Question Review List */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-slate-900">Question-by-Question Review</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">Question-by-Question Review</h3>
           {questions.map((q, idx) => {
             const userPick = submittedAnswers[q.id];
             const isCorrect = userPick === q.correctAnswerIndex;
@@ -392,190 +397,235 @@ export const QuizView: React.FC<QuizViewProps> = ({
     );
   }
 
-  // 3. Quiz Hub & Generator View (Default)
+  // 3. Quiz Hub & Flashcard Mode View
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-          Subject-Wise Quizzes & Practice
-        </h1>
-        <p className="text-sm text-slate-500 mt-0.5">
-          Reinforce understanding through curated question banks or dynamically generated quizzes from uploaded materials.
-        </p>
-      </div>
-
-      {/* Generator Configuration Card */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
-        <h2 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-indigo-600" />
-          <span>Generate New Diagnostic Quiz</span>
-        </h2>
-
-        {genError && (
-          <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700">
-            {genError}
-          </div>
-        )}
-
-        <form onSubmit={handleStartQuiz} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Subject */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                1. Subject *
-              </label>
-              <select
-                value={selectedSubjectId}
-                onChange={(e) => setSelectedSubjectId(e.target.value)}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                {subjects.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Optional Material source */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                2. Source Material
-              </label>
-              <select
-                value={selectedMaterialId}
-                onChange={(e) => setSelectedMaterialId(e.target.value)}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="">Curated Question Bank (Level 1)</option>
-                {materials
-                  .filter((m) => !selectedSubjectId || m.subjectId === selectedSubjectId)
-                  .map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.fileName} (Parsed doc)
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            {/* Questions count */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                3. Number of Questions
-              </label>
-              <select
-                value={numQuestions}
-                onChange={(e) => setNumQuestions(parseInt(e.target.value, 10))}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value={3}>3 Questions (Quick check)</option>
-                <option value={5}>5 Questions (Standard)</option>
-                <option value={10}>10 Questions (Comprehensive)</option>
-              </select>
-            </div>
-
-            {/* Difficulty */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                4. Target Difficulty
-              </label>
-              <select
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="Easy">Easy (Fundamentals)</option>
-                <option value="Medium">Medium (Application)</option>
-                <option value="Hard">Hard (Deep analysis)</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              disabled={generating}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors flex items-center gap-2"
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>{generating ? 'Compiling Questions...' : 'Start Quiz Session'}</span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Quiz History / Past Attempts */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-slate-900">Recent Quiz Performance</h2>
-            <p className="text-xs text-slate-500">
-              Quiz results update your adaptive study weights and diagnose weak topics.
-            </p>
-          </div>
-          <span className="text-xs font-mono text-slate-400">
-            {quizAttempts.length} Total Attempts
-          </span>
+      {/* Header with Mode Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Active Recall & Practice
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Reinforce syllabus retention through interactive digital flashcards or diagnostic quizzes.
+          </p>
         </div>
 
-        {quizAttempts.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 text-sm">
-            No quiz attempts recorded yet. Take your first quiz above!
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50/70 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <tr>
-                  <th className="px-6 py-3.5">Subject</th>
-                  <th className="px-6 py-3.5">Score</th>
-                  <th className="px-6 py-3.5">Percentage</th>
-                  <th className="px-6 py-3.5">Diagnosed Weak Topics</th>
-                  <th className="px-6 py-3.5">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {quizAttempts.map((att) => (
-                  <tr key={att.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-4 font-semibold text-slate-800">
-                      {att.subjectName}
-                    </td>
-                    <td className="px-6 py-4 tabular-nums text-slate-600">
-                      {att.score} / {att.totalQuestions}
-                    </td>
-                    <td className="px-6 py-4 tabular-nums">
-                      <span
-                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                          att.percentage >= 80
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : att.percentage >= 60
-                            ? 'bg-amber-50 text-amber-700'
-                            : 'bg-rose-50 text-rose-700'
-                        }`}
-                      >
-                        {att.percentage}%
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-slate-500">
-                      {att.weakTopics && att.weakTopics.length > 0 ? (
-                        <span className="text-rose-600 font-medium">
-                          {att.weakTopics.join(', ')}
-                        </span>
-                      ) : (
-                        <span className="text-emerald-600">None detected (Mastered)</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-xs text-slate-400 font-mono whitespace-nowrap">
-                      {att.attemptedAt.split('T')[0]}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {/* Mode Segmented Controls */}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/80 dark:border-slate-700 self-start sm:self-auto shadow-xs">
+          <button
+            type="button"
+            id="tab-diagnostic-quizzes"
+            data-testid="tab-diagnostic-quizzes"
+            onClick={() => setViewTab('quizzes')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
+              viewTab === 'quizzes'
+                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span>Diagnostic Quizzes</span>
+          </button>
+          <button
+            type="button"
+            id="tab-flashcard-mode"
+            data-testid="tab-flashcard-mode"
+            onClick={() => setViewTab('flashcards')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
+              viewTab === 'flashcards'
+                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>Flashcard Mode</span>
+          </button>
+        </div>
       </div>
+
+      {viewTab === 'flashcards' ? (
+        <FlashcardMode
+          subjects={subjects}
+          materials={materials}
+          initialSubjectId={selectedSubjectId}
+          initialMaterialId={selectedMaterialId}
+        />
+      ) : (
+        <>
+          {/* Generator Configuration Card */}
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Generate New Diagnostic Quiz</span>
+            </h2>
+
+            {genError && (
+              <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 rounded-xl text-xs text-rose-700 dark:text-rose-300">
+                {genError}
+              </div>
+            )}
+
+            <form onSubmit={handleStartQuiz} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Subject */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    1. Subject *
+                  </label>
+                  <select
+                    value={selectedSubjectId}
+                    onChange={(e) => setSelectedSubjectId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                  >
+                    {subjects.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Optional Material source */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    2. Source Material
+                  </label>
+                  <select
+                    value={selectedMaterialId}
+                    onChange={(e) => setSelectedMaterialId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                  >
+                    <option value="">Curated Question Bank (Level 1)</option>
+                    {materials
+                      .filter((m) => !selectedSubjectId || m.subjectId === selectedSubjectId)
+                      .map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.fileName} (Parsed doc)
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                {/* Questions count */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    3. Number of Questions
+                  </label>
+                  <select
+                    value={numQuestions}
+                    onChange={(e) => setNumQuestions(parseInt(e.target.value, 10))}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                  >
+                    <option value={3}>3 Questions (Quick check)</option>
+                    <option value={5}>5 Questions (Standard)</option>
+                    <option value={10}>10 Questions (Comprehensive)</option>
+                  </select>
+                </div>
+
+                {/* Difficulty */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    4. Target Difficulty
+                  </label>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value as any)}
+                    className="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                  >
+                    <option value="Easy">Easy (Fundamentals)</option>
+                    <option value="Medium">Medium (Application)</option>
+                    <option value="Hard">Hard (Deep analysis)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  disabled={generating}
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-colors flex items-center gap-2"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>{generating ? 'Compiling Questions...' : 'Start Quiz Session'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Quiz History / Past Attempts */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Recent Quiz Performance</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Quiz results update your adaptive study weights and diagnose weak topics.
+                </p>
+              </div>
+              <span className="text-xs font-mono text-slate-400 dark:text-slate-500">
+                {quizAttempts.length} Total Attempts
+              </span>
+            </div>
+
+            {quizAttempts.length === 0 ? (
+              <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-sm">
+                No quiz attempts recorded yet. Take your first quiz above!
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50/70 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    <tr>
+                      <th className="px-6 py-3.5">Subject</th>
+                      <th className="px-6 py-3.5">Score</th>
+                      <th className="px-6 py-3.5">Percentage</th>
+                      <th className="px-6 py-3.5">Diagnosed Weak Topics</th>
+                      <th className="px-6 py-3.5">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {quizAttempts.map((att) => (
+                      <tr key={att.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">
+                          {att.subjectName}
+                        </td>
+                        <td className="px-6 py-4 tabular-nums text-slate-600 dark:text-slate-300">
+                          {att.score} / {att.totalQuestions}
+                        </td>
+                        <td className="px-6 py-4 tabular-nums">
+                          <span
+                            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                              att.percentage >= 80
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
+                                : att.percentage >= 60
+                                ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+                                : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300'
+                            }`}
+                          >
+                            {att.percentage}%
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-xs text-slate-500 dark:text-slate-400">
+                          {att.weakTopics && att.weakTopics.length > 0 ? (
+                            <span className="text-rose-600 dark:text-rose-400 font-medium">
+                              {att.weakTopics.join(', ')}
+                            </span>
+                          ) : (
+                            <span className="text-emerald-600 dark:text-emerald-400">None detected (Mastered)</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-xs text-slate-400 dark:text-slate-500 font-mono whitespace-nowrap">
+                          {att.attemptedAt.split('T')[0]}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

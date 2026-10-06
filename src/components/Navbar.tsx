@@ -1,6 +1,8 @@
 import React from 'react';
-import { User } from '../types';
+import { User, StudyTask } from '../types';
 import { BookOpen, Sparkles, GraduationCap, LogOut, Code2, User as UserIcon, Sun, Moon } from 'lucide-react';
+import { NotificationBell } from './NotificationBell';
+import { AppNotification } from '../services/notificationService';
 
 interface NavbarProps {
   user: User | null;
@@ -10,6 +12,11 @@ interface NavbarProps {
   onOpenAuth?: (mode: 'login' | 'register') => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
+  notifications?: AppNotification[];
+  upcomingTasks?: StudyTask[];
+  onClearNotifications?: () => void;
+  onSendTestReminder?: () => void;
+  onSimulateUpcomingTask?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -20,6 +27,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
   theme = 'light',
   onToggleTheme,
+  notifications = [],
+  upcomingTasks = [],
+  onClearNotifications = () => {},
+  onSendTestReminder = () => {},
+  onSimulateUpcomingTask,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-8 py-3.5 transition-colors">
@@ -101,8 +113,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
         )}
 
-        {/* Zone 3: Primary Action buttons & Global Theme Toggle */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Zone 3: Primary Action buttons, Notification Bell & Global Theme Toggle */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* 15-Minute Study Task Notification Bell */}
+          <NotificationBell
+            notifications={notifications}
+            upcomingTasks={upcomingTasks}
+            onClearNotifications={onClearNotifications}
+            onSendTestReminder={onSendTestReminder}
+            onSimulateUpcomingTask={onSimulateUpcomingTask}
+            onNavigateToPlanner={() => setActiveTab('planner')}
+          />
+
           {/* Global Theme Toggle Button */}
           <button
             id="theme-toggle"

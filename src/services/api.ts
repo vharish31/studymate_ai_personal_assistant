@@ -1,4 +1,4 @@
-import { User, Subject, StudyMaterial, Quiz, QuizAttempt, StudyTask, ProgressData } from '../types';
+import { User, Subject, StudyMaterial, Quiz, QuizAttempt, StudyTask, ProgressData, FocusSession } from '../types';
 
 const TOKEN_KEY = 'studymate_auth_token';
 
@@ -286,5 +286,21 @@ export const api = {
     if (!res.ok) throw new Error('Failed to fetch Java project files');
     const data = await res.json();
     return data.files;
+  },
+
+  // Focus & Pomodoro Sessions
+  async logFocusSession(taskId?: string, minutes?: number, completeTask = false): Promise<{
+    success: boolean;
+    message: string;
+    session: FocusSession;
+    task?: StudyTask;
+  }> {
+    const res = await fetchWithAuth('/api/progress/log-focus', {
+      method: 'POST',
+      body: JSON.stringify({ taskId, minutes, completeTask }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to log focus minutes');
+    return data;
   },
 };

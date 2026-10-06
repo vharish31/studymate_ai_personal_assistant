@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StudyTask, Subject, User } from '../types';
 import {
   CalendarDays,
@@ -9,7 +9,10 @@ import {
   RotateCw,
   Filter,
   Check,
+  Bell,
+  Volume2,
 } from 'lucide-react';
+import { notificationService } from '../services/notificationService';
 
 interface StudyPlannerProps {
   user: User;
@@ -17,6 +20,8 @@ interface StudyPlannerProps {
   studyTasks: StudyTask[];
   onGeneratePlan: (dailyHours: number, startTime: string) => Promise<void>;
   onUpdateTaskStatus: (taskId: string, status: 'Pending' | 'In Progress' | 'Completed') => Promise<void>;
+  onSendTestReminder?: (task?: StudyTask) => void;
+  onSimulateUpcomingTask?: () => void;
 }
 
 export const StudyPlanner: React.FC<StudyPlannerProps> = ({
@@ -25,12 +30,17 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
   studyTasks,
   onGeneratePlan,
   onUpdateTaskStatus,
+  onSendTestReminder,
+  onSimulateUpcomingTask,
 }) => {
   const [dailyHours, setDailyHours] = useState<number>(user.dailyStudyHours || 3.5);
   const [startTime, setStartTime] = useState<string>(user.preferredStartTime || '16:00');
   const [generating, setGenerating] = useState(false);
   const [selectedDayOffset, setSelectedDayOffset] = useState<number>(0);
   const [filterSubject, setFilterSubject] = useState<string>('all');
+  const [permission, setPermission] = useState<NotificationPermission>(() =>
+    notificationService.getPermission()
+  );
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -127,6 +137,63 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
             <RotateCw className={`w-3.5 h-3.5 ${generating ? 'animate-spin' : ''}`} />
             <span>{generating ? 'Calculating Weights...' : 'Regenerate Plan'}</span>
           </button>
+        </div>
+      </div>
+
+      {/* 15-Minute Web-Notification Reminder System Banner */}
+      <div className="bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-sky-500/10 dark:from-amber-950/40 dark:via-indigo-950/40 dark:to-sky-950/40 p-4 sm:p-5 rounded-3xl border border-indigo-200/80 dark:border-indigo-900/80 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-amber-500 dark:bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-amber-200 dark:shadow-none">
+            <Bell className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                Web-Notification Reminder System
+              </h2>
+              <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 px-2 py-0.5 rounded-full">
+                15m Advance Alert Active
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+              Automatically alerts you via desktop Web Notification & audio chime 15 minutes before scheduled tasks are due.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+          {permission !== 'granted' && (
+            <button
+              onClick={async () => {
+                const res = await notificationService.requestPermission();
+                setPermission(res);
+              }}
+              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <Bell className="w-3.5 h-3.5" />
+              <span>Enable Browser Alerts</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => onSendTestReminder?.(currentTasks[0] || studyTasks[0])}
+            className="px-3 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
+            title="Trigger an immediate 15-minute advance reminder simulation"
+          >
+            <Volume2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <span>Test 15m Reminder</span>
+          </button>
+
+          {onSimulateUpcomingTask && (
+            <button
+              onClick={onSimulateUpcomingTask}
+              className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1"
+              title="Add a sample task scheduled 15 minutes from now for live timer demonstration"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Simulate Task in 15m</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -276,6 +343,17 @@ export const StudyPlanner: React.FC<StudyPlannerProps> = ({
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {/* 15m advance reminder button/badge */}
+                    <button
+                      type="button"
+                      onClick={() => onSendTestReminder?.(task)}
+                      title={`15-Minute reminder active for ${task.topic}. Click to test reminder.`}
+                      className="px-2 py-1 rounded-lg text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-[11px] font-medium flex items-center gap-1 transition-colors border border-amber-200/70 dark:border-amber-900/60"
+                    >
+                      <Bell className="w-3 h-3 text-amber-500" />
+                      <span className="hidden sm:inline">15m alert</span>
+                    </button>
+
                     <span
                       className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                         task.status === 'Completed'

@@ -107,4 +107,40 @@ export interface ProgressData {
   totalQuizzesTaken: number;
   subjectPerformance: SubjectPerformance[];
   weakTopics: Array<{ topic: string; missedCount: number }>;
+  totalFocusedMinutes?: number;
+  todayFocusedMinutes?: number;
+  focusSessionsCount?: number;
+  focusWeeklyTrends?: FocusDayTrend[];
+}
+
+export interface FocusDayTrend {
+  date: string;
+  dayName: string;
+  minutes: number;
+  sessionsCount: number;
+}
+
+export interface FocusSession {
+  id: string;
+  userId: string;
+  taskId?: string;
+  minutes: number;
+  timestamp: string;
+}
+
+export interface Flashcard {
+  id: string;
+  userId?: string;
+  subjectId: string;
+  subjectName: string;
+  materialId?: string;
+  materialName?: string;
+  topic: string;
+  front: string;
+  back: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  mastered?: boolean;
+  reviewCount?: number;
+  lastReviewed?: string;
+  createdAt: string;
 }
