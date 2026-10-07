@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProgressData, QuizAttempt, Subject } from '../types';
+import { ProgressData, QuizAttempt, Subject, User } from '../types';
 import {
   BarChart3,
   CheckCircle2,
@@ -14,15 +14,24 @@ import {
   Target,
   Sparkles,
   ArrowUpRight,
+  FileText,
+  Download,
+  Check,
+  Loader2,
+  Eye,
+  X,
 } from 'lucide-react';
+import { downloadProgressPDFReport } from '../utils/pdfExport';
 
 interface ProgressViewProps {
+  user?: User | null;
   progress: ProgressData | null;
   quizAttempts: QuizAttempt[];
   subjects: Subject[];
 }
 
 export const ProgressView: React.FC<ProgressViewProps> = ({
+  user,
   progress,
   quizAttempts,
   subjects,
@@ -73,14 +82,86 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
   const peakDay = weeklyTrends.reduce((prev, curr) => (curr.minutes > prev.minutes ? curr : prev), weeklyTrends[0]);
   const activeFocusDaysCount = weeklyTrends.filter((d) => d.minutes > 0).length;
 
+  // PDF Export state
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [exportSuccess, setExportSuccess] = useState<boolean>(false);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      // Short delay for UI spinner smoothness
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      downloadProgressPDFReport({
+        user,
+        progress,
+        quizAttempts,
+        subjects,
+        weeklyTrends,
+      });
+      setExportSuccess(true);
+      setTimeout(() => setExportSuccess(false), 3000);
+    } catch (err) {
+      console.error('Failed to export PDF report', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Progress & Analytics</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-          Real-time tracking of syllabus coverage, revision consistency, and mastery metrics.
-        </p>
+      {/* Header with PDF Export Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Progress & Analytics</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Real-time tracking of syllabus coverage, revision consistency, and mastery metrics.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          <button
+            type="button"
+            id="btn-preview-report"
+            data-testid="btn-preview-report"
+            onClick={() => setShowExportModal(true)}
+            className="px-3.5 py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs font-semibold shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-98"
+            title="Preview report contents"
+          >
+            <Eye className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+            <span className="hidden sm:inline">Preview Report</span>
+          </button>
+
+          <button
+            type="button"
+            id="btn-export-pdf-report"
+            data-testid="btn-export-pdf-report"
+            disabled={isExporting}
+            onClick={handleExportPDF}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-98 ${
+              exportSuccess
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20'
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'
+            } disabled:opacity-70`}
+          >
+            {isExporting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Generating PDF...</span>
+              </>
+            ) : exportSuccess ? (
+              <>
+                <Check className="w-4 h-4 text-white" />
+                <span>PDF Downloaded!</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4 text-white" />
+                <span>Export PDF Report</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Top 4 KPI Metrics */}
@@ -498,6 +579,143 @@ export const ProgressView: React.FC<ProgressViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Export Report Preview & Confirmation Modal */}
+      {showExportModal && (
+        <div
+          id="export-pdf-modal"
+          data-testid="export-pdf-modal"
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setShowExportModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Export Academic Progress Report
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Download an official, print-ready PDF summary of your study record.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Document Snapshot */}
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 space-y-3">
+              <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/50 dark:border-slate-700/60">
+                <span className="text-slate-500 dark:text-slate-400">Student:</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{user?.name || 'Enrolled Student'} ({user?.email || 'N/A'})</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-slate-400 block text-[11px]">Syllabus Coverage:</span>
+                  <span className="font-bold text-slate-900 dark:text-white tabular-nums">
+                    {progress.completionPercentage}% ({progress.completedTasks}/{progress.totalTasks} tasks)
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[11px]">Diagnostic Quiz Avg:</span>
+                  <span className="font-bold text-amber-600 dark:text-amber-400 tabular-nums">
+                    {progress.quizAverage}% ({quizAttempts.length} tests)
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[11px]">Total Study Hours:</span>
+                  <span className="font-bold text-slate-900 dark:text-white tabular-nums">
+                    {progress.totalStudyHours} hrs
+                  </span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[11px]">Weekly Pomodoro Focus:</span>
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">
+                    {totalWeeklyMinutes} mins ({totalWeeklyHours} hrs)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Inclusions List */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Report Sections Included
+              </h4>
+              <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Verified Student Profile & Executive KPI Summary</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Past 7 Days Deep Work & Focus Duration Trends</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Subject-wise Exam Readiness & Task Breakdown Table</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Diagnostic Quiz History with Scored Performance Records</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>Diagnosed Weak Topics & Targeted Reinforcement Schedule</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                id="btn-confirm-download-pdf"
+                data-testid="btn-confirm-download-pdf"
+                disabled={isExporting}
+                onClick={async () => {
+                  await handleExportPDF();
+                  setShowExportModal(false);
+                }}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-500/20 transition-all flex items-center gap-2 cursor-pointer active:scale-98 disabled:opacity-70"
+              >
+                {isExporting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Generating PDF...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 text-white" />
+                    <span>Download PDF Report</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

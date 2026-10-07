@@ -465,6 +465,7 @@ export default function App() {
 
             {activeTab === 'progress' && (
               <ProgressView
+                user={user}
                 progress={progress}
                 quizAttempts={quizAttempts}
                 subjects={subjects}
